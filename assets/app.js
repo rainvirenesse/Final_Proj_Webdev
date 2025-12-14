@@ -1,10 +1,26 @@
-import './stimulus_bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
+// Tailwind CSS
 import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+// jQuery
+import $ from 'jquery';
+window.$ = window.jQuery = $;
+
+// DataTables JS + CSS
+import dt from 'datatables.net';
+import 'datatables.net-dt/css/dataTables.dataTables.css'; // correct CSS for v2+
+
+// Attach DataTables to jQuery
+dt(window, $);
+
+// Initialize minimal DataTable
+$(document).ready(function () {
+    console.log('jQuery:', $);               // should log jQuery function
+    console.log('DataTable function:', $.fn.DataTable); // should now be a function
+
+    $('.datatable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: true
+    });
+});

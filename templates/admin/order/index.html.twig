@@ -1,0 +1,46 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Orders</h1>
+        <a href="{{ path('admin_customer_order_new') }}" class="btn btn-dark">+ Add New Order</a>
+    </div>
+    
+    {% set headers = ['ID', 'Order Number', 'Client', 'Total Price', 'Status', 'Payment Status', 'Order Date'] %}
+    {% set rows = [] %}
+    
+    {% for order in orders %}
+        {% set statusBadge = '<span class="badge ' ~ 
+            (order.status == 'COMPLETED' ? 'badge-admin-success' : 
+             (order.status == 'IN_PROGRESS' ? 'badge-admin-warning' : 
+              (order.status == 'PENDING' ? 'badge-admin-info' : 'badge-admin-danger'))) ~ 
+            '">' ~ order.status ~ '</span>' %}
+        {% set paymentBadge = '<span class="badge ' ~ 
+            (order.paymentStatus == 'PAID' ? 'badge-admin-success' : 
+             (order.paymentStatus == 'PARTIALLY_PAID' ? 'badge-admin-warning' : 'badge-admin-danger')) ~ 
+            '">' ~ order.paymentStatus ~ '</span>' %}
+        {% set row = [
+            order.id,
+            order.orderNumber,
+            order.client.email,
+            '₱' ~ order.totalPrice|number_format(2, '.', ','),
+            statusBadge,
+            paymentBadge,
+            order.orderedAt|date('Y-m-d')
+        ] %}
+        {% set rows = rows|merge([row]) %}
+    {% endfor %}
+    
+    {% include 'admin/partials/_tables.html.twig' with {
+        'tableId': 'ordersTable',
+        'headers': headers,
+        'rows': rows,
+        'editRoute': 'admin_customer_order_edit',
+        'showRoute': 'admin_customer_order_show',
+        'deleteRoute': 'admin_customer_order_delete'
+    } %}
+</div>
+{% endblock %}

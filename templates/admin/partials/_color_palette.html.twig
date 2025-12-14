@@ -1,0 +1,85 @@
+{# Admin Color Palette - Consistent Design System #}
+<style>
+    /* ============================================
+       ADMIN COLOR PALETTE
+       ============================================ */
+    
+    /* Primary Colors */
+    :root {
+        --admin-dark: #212529;        /* Sidebar background */
+        --admin-dark-hover: #343a40;   /* Sidebar hover/active */
+        --admin-table-header: #1f2937; /* Table header background */
+        --admin-table-header-hover: #374151; /* Table header hover */
+        
+        /* Neutral Colors */
+        --admin-white: #ffffff;
+        --admin-bg-light: #f9fafb;
+        --admin-bg-lighter: #fafafa;
+        
+        /* Border Colors */
+        --admin-border: #e5e7eb;
+        --admin-border-light: #d1d5db;
+        --admin-border-lighter: #f3f4f6;
+        
+        /* Text Colors */
+        --admin-text-dark: #374151;
+        --admin-text-muted: #6b7280;
+        --admin-text-light: #adb5bd;
+        --admin-text-white: #ffffff;
+        
+        /* Accent Colors */
+        --admin-success: #10b981;
+        --admin-warning: #f59e0b;
+        --admin-danger: #ef4444;
+        --admin-info: #3b82f6;
+    }
+    
+    /* Consistent Card Styling */
+    .admin-card {
+        border: 1px solid var(--admin-border);
+        border-radius: 0.5rem;
+        background: var(--admin-white);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    
+    .admin-card-header {
+        background: var(--admin-white);
+        border-bottom: 1px solid var(--admin-border);
+        padding: 1rem 1.5rem;
+    }
+    
+    /* Consistent Button Styling */
+    .btn-admin-primary {
+        background-color: var(--admin-table-header);
+        border-color: var(--admin-table-header);
+        color: var(--admin-text-white);
+    }
+    
+    .btn-admin-primary:hover {
+        background-color: var(--admin-table-header-hover);
+        border-color: var(--admin-table-header-hover);
+        color: var(--admin-text-white);
+    }
+    
+    /* Consistent Badge Styling */
+    .badge-admin-success {
+        background-color: var(--admin-success);
+        color: var(--admin-text-white);
+    }
+    
+    .badge-admin-warning {
+        background-color: var(--admin-warning);
+        color: var(--admin-text-white);
+    }
+    
+    .badge-admin-danger {
+        background-color: var(--admin-danger);
+        color: var(--admin-text-white);
+    }
+    
+    .badge-admin-info {
+        background-color: var(--admin-info);
+        color: var(--admin-text-white);
+    }
+</style>
+

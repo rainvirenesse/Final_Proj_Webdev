@@ -1,0 +1,325 @@
+{# templates/admin/home.html.twig #}
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <!-- Welcome Section -->
+    <div class="mb-4">
+        <h1 class="h3 fw-bold">Welcome back, Admin!</h1>
+        <p class="text-muted">Here's what's happening with your creative services today.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Users</p>
+                    <h3 class="fw-bold">{{ totalUsers }}</h3>
+                    <small class="text-muted">Registered users</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Staff</p>
+                    <h3 class="fw-bold">{{ totalStaff }}</h3>
+                    <small class="text-muted">Staff & Admin accounts</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Active Orders</p>
+                    <h3 class="fw-bold">{{ activeOrders }}</h3>
+                    <small class="text-muted">In progress or pending</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Completed Orders</p>
+                    <h3 class="fw-bold">{{ completedOrders }}</h3>
+                    <small class="text-muted">All time</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Stats Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Products</p>
+                    <h3 class="fw-bold">{{ totalProducts }}</h3>
+                    <small class="text-success">{{ activeProducts }} active</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Services</p>
+                    <h3 class="fw-bold">{{ totalServices }}</h3>
+                    <small class="text-muted">Available services</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Orders</p>
+                    <h3 class="fw-bold">{{ totalOrders }}</h3>
+                    <small class="text-muted">All orders</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    {% if recentActivities|length > 0 %}
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for activity in recentActivities %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">
+                                    <span class="badge badge-admin-{{ activity.action == 'LOGIN' or activity.action == 'LOGOUT' ? 'info' : (activity.action == 'CREATE' ? 'success' : (activity.action == 'UPDATE' ? 'warning' : 'danger')) }}">
+                                        {{ activity.action }}
+                                    </span>
+                                    {{ activity.description }}
+                                </h6>
+                                <small>{{ activity.createdAt|date('Y-m-d H:i:s') }}</small>
+                            </div>
+                            <p class="mb-1">
+                                <small class="text-muted">
+                                    User: {{ activity.user ? activity.user.email : 'System/Unknown' }} 
+                                    ({{ activity.userRoles|join(', ') }})
+                                    {% if activity.entityType %} | Entity: {{ activity.entityType }}{% endif %}
+                                </small>
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Orders + Quick Actions -->
+    <div class="row g-3">
+        <!-- Recent Orders -->
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recent Orders</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recentOrders|length > 0 %}
+                    <table id="ordersTable" class="w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Order Number</th>
+                                <th class="text-left">Client</th>
+                                <th class="text-left">Total Price</th>
+                                <th class="text-left">Status</th>
+                                <th class="text-left">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recentOrders %}
+                            <tr>
+                                <td>{{ order.orderNumber }}</td>
+                                <td>{{ order.client.email }}</td>
+                                <td>₱{{ order.totalPrice|number_format(2, '.', ',') }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if order.status == 'COMPLETED' %}badge-admin-success
+                                        {% elseif order.status == 'IN_PROGRESS' %}badge-admin-warning
+                                        {% elseif order.status == 'PENDING' %}badge-admin-info
+                                        {% else %}badge-admin-danger{% endif %}">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>{{ order.orderedAt|date('Y-m-d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No orders yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <a href="{{ path('admin_product_new') }}" class="btn btn-dark">+ Add New Product</a>
+                    <a href="{{ path('admin_user_new') }}" class="btn btn-outline-secondary">+ Add New User</a>
+                    <a href="{{ path('admin_service_new') }}" class="btn btn-outline-secondary">+ Add New Service</a>
+                    <a href="{{ path('admin_product_index') }}" class="btn btn-outline-secondary">View All Products</a>
+                    <a href="{{ path('admin_customer_order_index') }}" class="btn btn-outline-secondary">View All Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ parent() }}
+<style>
+    /* Consistent table styling for dashboard */
+    #ordersTable {
+        border: 1px solid var(--admin-border) !important;
+    }
+
+    #ordersTable thead th {
+        border: 1px solid var(--admin-border) !important;
+        border-width: 0 0 1px 0 !important;
+        background-color: var(--admin-table-header) !important;
+        color: var(--admin-text-white) !important;
+        font-weight: 500;
+        padding: 0.75rem 1rem;
+    }
+
+    #ordersTable tbody td {
+        border: 1px solid var(--admin-border-lighter) !important;
+        border-width: 0 0 1px 0 !important;
+        padding: 0.75rem 1rem;
+    }
+
+    #ordersTable tbody tr {
+        border: none !important;
+        transition: background-color 0.2s ease;
+    }
+
+    #ordersTable tbody tr:hover {
+        background-color: var(--admin-bg-light) !important;
+    }
+
+    #ordersTable tbody tr:nth-child(even) {
+        background-color: var(--admin-white);
+    }
+
+    #ordersTable tbody tr:nth-child(odd) {
+        background-color: var(--admin-bg-lighter);
+    }
+
+    #ordersTable .badge {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        color: var(--admin-text-dark);
+        font-size: 0.875rem;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        margin-left: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid var(--admin-border-light);
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+    }
+
+    .dataTables_wrapper .dataTables_filter input:focus {
+        outline: none;
+        border-color: var(--admin-table-header);
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+        padding: 0.375rem 2rem 0.375rem 0.75rem;
+        border: 1px solid var(--admin-border-light);
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        margin: 0 0.5rem;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        float: left;
+        padding: 1rem 1.5rem;
+        color: var(--admin-text-muted);
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        float: right;
+        padding: 1rem 1.5rem;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: var(--admin-table-header) !important;
+        border-color: var(--admin-table-header) !important;
+        color: var(--admin-text-white) !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
+        background: var(--admin-table-header-hover) !important;
+        border-color: var(--admin-table-header-hover) !important;
+        color: var(--admin-text-white) !important;
+    }
+</style>
+
+<script>
+    window.addEventListener('load', function() {
+        if (typeof jQuery !== 'undefined' && typeof jQuery.fn.DataTable !== 'undefined') {
+            var $table = jQuery('#ordersTable');
+            if ($table.length && !jQuery.fn.DataTable.isDataTable('#ordersTable')) {
+                $table.DataTable({
+                    "pageLength": 5,
+                    "lengthMenu": [[5, 10, 25, 50], [5, 10, 25, 50]],
+                    "ordering": true,
+                    "order": [[4, "desc"]],
+                    "searching": true,
+                    "paging": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    "language": {
+                        "search": "Search:",
+                        "lengthMenu": "Show _MENU_ entries",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "Showing 0 to 0 of 0 entries",
+                        "infoFiltered": "(filtered from _MAX_ total entries)",
+                        "zeroRecords": "No matching records found",
+                        "emptyTable": "No data available in table",
+                        "paginate": {
+                            "first": "First",
+                            "last": "Last",
+                            "next": "Next",
+                            "previous": "Previous"
+                        }
+                    },
+                    "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+                });
+            }
+        }
+    });
+</script>
+{% endblock %}

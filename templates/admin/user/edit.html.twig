@@ -1,0 +1,41 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">Edit User: {{ user.email }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    {{ include('admin/user/_form.html.twig', {'button_label': 'Update', 'show_button': false}) }}
+                </div>
+                <div class="card-footer bg-white border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary">← Back to list</a>
+                        <button type="submit" form="user-form" class="btn btn-dark">
+                            <i class="bi bi-check-circle me-2"></i>Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: 1px solid var(--admin-border);
+        border-radius: 0.5rem;
+    }
+    .card-header {
+        padding: 1.25rem 1.5rem;
+    }
+    .card-footer {
+        padding: 1.25rem 1.5rem;
+    }
+</style>
+{% endblock %}

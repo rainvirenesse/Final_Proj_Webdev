@@ -1,0 +1,171 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="bi bi-pencil me-2"></i>Edit Profile
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    {{ form_start(form, {'attr': {'class': 'profile-form', 'id': 'profile-form'}}) }}
+                    
+                    <!-- Basic Information Section -->
+                    <div class="form-section mb-4">
+                        <h6 class="section-heading mb-3">
+                            <i class="bi bi-person-circle me-2"></i>Basic Information
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(form.username, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                    {{ form_widget(form.username, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                                    {{ form_errors(form.username) }}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                    {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                                    {{ form_errors(form.email) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Image Section -->
+                    {% if form.image is defined %}
+                    <div class="form-section mb-4">
+                        <h6 class="section-heading mb-3">
+                            <i class="bi bi-image me-2"></i>Profile Image
+                        </h6>
+                        
+                        <div class="form-group">
+                            {{ form_label(form.image, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            <div class="image-upload-wrapper">
+                                {{ form_widget(form.image, {'attr': {'class': 'form-control form-control-lg', 'accept': 'image/*'}}) }}
+                                <small class="form-text text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>Upload JPG, PNG or GIF (Max 2MB)
+                                </small>
+                            </div>
+                            {{ form_errors(form.image) }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {{ form_end(form) }}
+                </div>
+                <div class="card-footer bg-white border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{{ path('profile_show') }}" class="btn btn-outline-secondary">← Cancel</a>
+                        <button type="submit" form="profile-form" class="btn btn-dark">
+                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: 1px solid var(--admin-border);
+        border-radius: 0.5rem;
+    }
+    .card-header {
+        padding: 1.25rem 1.5rem;
+    }
+    .card-footer {
+        padding: 1.25rem 1.5rem;
+    }
+    .card-header i {
+        color: var(--admin-table-header);
+    }
+    
+    .profile-form {
+        background: transparent;
+    }
+    
+    .form-section {
+        background: var(--admin-white);
+        border: 1px solid var(--admin-border);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .form-section:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .section-heading {
+        color: var(--admin-text-dark);
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--admin-border-lighter);
+        margin-bottom: 1rem !important;
+    }
+    
+    .section-heading i {
+        color: var(--admin-table-header);
+    }
+    
+    .form-group {
+        margin-bottom: 0;
+    }
+    
+    .form-label {
+        color: var(--admin-text-dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.9375rem;
+    }
+    
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid var(--admin-border);
+        border-radius: 0.375rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--admin-table-header);
+        box-shadow: 0 0 0 0.25rem rgba(31, 41, 55, 0.15);
+        outline: 0;
+    }
+    
+    .image-upload-wrapper {
+        position: relative;
+    }
+    
+    .form-text {
+        font-size: 0.875rem;
+    }
+    
+    .form-errors {
+        color: var(--admin-danger);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    
+    .invalid-feedback {
+        display: block;
+        color: var(--admin-danger);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+

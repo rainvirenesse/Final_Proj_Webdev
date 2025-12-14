@@ -1,0 +1,41 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Products{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Products</h1>
+        <a href="{{ path('admin_product_new') }}" class="btn btn-dark">+ Add New Product</a>
+    </div>
+        {% set headers = ['ID', 'Name', 'Price', 'Status', 'Category'] %}
+        {% set rows = [] %}
+
+        {% for product in products %}
+            {% set statusBadge = '<span class="badge ' ~ 
+                (product.status == 'ACTIVE' ? 'badge-admin-success' : 
+                 (product.status == 'OUT_OF_STOCK' ? 'badge-admin-danger' : 'badge-admin-warning')) ~ 
+                '">' ~ product.status ~ '</span>' %}
+            {% set row = [
+                product.id,
+                product.name,
+                '₱' ~ product.price|number_format(2, '.', ','),
+                statusBadge,
+                product.category ?? 'N/A'
+            ] %}
+            {% set rows = rows|merge([row]) %}
+        {% endfor %}
+
+        {% include 'admin/partials/_tables.html.twig' with {
+            'tableId': 'productsTable',
+            'headers': headers,
+            'rows': rows,
+            'editRoute': 'admin_product_edit',
+            'showRoute': 'admin_product_show',
+            'deleteRoute': 'admin_product_delete'
+        } %}
+
+</div>
+{% endblock %}
+

@@ -1,0 +1,393 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}New Order{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">Create New Order</h5>
+                </div>
+                <div class="card-body p-4">
+                    {{ include('admin/order/_form.html.twig', {'order': null}) }}
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="{{ path('staff_customer_order_index') }}" class="btn btn-outline-secondary">← Back to list</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productSelect = document.querySelector('select.product-select');
+    const serviceSelect = document.querySelector('select.service-select');
+    
+    const productPrices = {{ productPrices|json_encode|raw }};
+    const servicePrices = {{ servicePrices|json_encode|raw }};
+    
+    // Initialize custom multiselect for products
+    if (productSelect) {
+        initCustomMultiselect(productSelect, productPrices, 'product');
+    }
+    
+    // Initialize custom multiselect for services
+    if (serviceSelect) {
+        initCustomMultiselect(serviceSelect, servicePrices, 'service');
+    }
+    
+    function initCustomMultiselect(selectElement, prices, type) {
+        const wrapper = selectElement.closest('.custom-multiselect-wrapper');
+        if (!wrapper) return;
+        
+        const customSelect = wrapper.querySelector('.custom-multiselect');
+        const selectedDiv = customSelect.querySelector('.custom-multiselect-selected');
+        const dropdown = customSelect.querySelector('.custom-multiselect-dropdown');
+        const optionsDiv = customSelect.querySelector('.custom-multiselect-options');
+        const searchInput = customSelect.querySelector('.custom-multiselect-search input');
+        const placeholder = customSelect.querySelector('.placeholder');
+        const selectedItems = customSelect.querySelector('.selected-items');
+        
+        // Build options from select element
+        const options = Array.from(selectElement.options);
+        let filteredOptions = options;
+        
+        function renderOptions(optionsToRender) {
+            optionsDiv.innerHTML = '';
+            optionsToRender.forEach(function(option) {
+                if (option.value === '') return; // Skip empty option
+                
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'custom-multiselect-option';
+                if (option.selected) {
+                    optionDiv.classList.add('selected');
+                }
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = option.selected;
+                checkbox.value = option.value;
+                
+                const label = document.createElement('label');
+                label.textContent = option.text;
+                label.style.cursor = 'pointer';
+                label.style.margin = 0;
+                label.style.flex = 1;
+                
+                optionDiv.appendChild(checkbox);
+                optionDiv.appendChild(label);
+                
+                // Toggle selection
+                function toggleSelection() {
+                    option.selected = !option.selected;
+                    checkbox.checked = option.selected;
+                    if (option.selected) {
+                        optionDiv.classList.add('selected');
+                    } else {
+                        optionDiv.classList.remove('selected');
+                    }
+                    updateSelectedItems();
+                    calculateTotal();
+                    // Trigger change event on original select
+                    selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                
+                checkbox.addEventListener('change', toggleSelection);
+                label.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleSelection();
+                });
+                optionDiv.addEventListener('click', function(e) {
+                    if (e.target !== checkbox && e.target !== label) {
+                        toggleSelection();
+                    }
+                });
+                
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+        
+        function updateSelectedItems() {
+            const selected = Array.from(selectElement.selectedOptions);
+            if (selected.length === 0) {
+                placeholder.style.display = 'inline';
+                selectedItems.innerHTML = '';
+            } else {
+                placeholder.style.display = 'none';
+                selectedItems.innerHTML = '';
+                selected.forEach(function(option) {
+                    const item = document.createElement('span');
+                    item.className = 'selected-item';
+                    item.textContent = option.text.split(' - ')[0]; // Remove price from display
+                    const remove = document.createElement('span');
+                    remove.className = 'remove';
+                    remove.textContent = '×';
+                    remove.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        option.selected = false;
+                        updateSelectedItems();
+                        renderOptions(filteredOptions);
+                        calculateTotal();
+                        selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    item.appendChild(remove);
+                    selectedItems.appendChild(item);
+                });
+            }
+        }
+        
+        // Search functionality
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filteredOptions = options.filter(function(option) {
+                    return option.text.toLowerCase().includes(searchTerm);
+                });
+                renderOptions(filteredOptions);
+            });
+        }
+        
+        // Toggle dropdown
+        selectedDiv.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = dropdown.style.display !== 'none';
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.custom-multiselect-dropdown').forEach(function(dd) {
+                if (dd !== dropdown) {
+                    dd.style.display = 'none';
+                }
+            });
+            document.querySelectorAll('.custom-multiselect-selected').forEach(function(sd) {
+                if (sd !== selectedDiv) {
+                    sd.classList.remove('active');
+                }
+            });
+            
+            if (isOpen) {
+                dropdown.style.display = 'none';
+                selectedDiv.classList.remove('active');
+            } else {
+                dropdown.style.display = 'block';
+                selectedDiv.classList.add('active');
+                renderOptions(filteredOptions);
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!customSelect.contains(e.target)) {
+                dropdown.style.display = 'none';
+                selectedDiv.classList.remove('active');
+            }
+        });
+        
+        // Initial render
+        renderOptions(filteredOptions);
+        updateSelectedItems();
+    }
+    
+    function calculateTotal() {
+        let total = 0;
+        
+        // Calculate products total
+        if (productSelect) {
+            const selectedProducts = Array.from(productSelect.selectedOptions);
+            selectedProducts.forEach(function(option) {
+                if (option.value) {
+                    const productId = parseInt(option.value);
+                    if (productPrices[productId] !== undefined && !isNaN(productPrices[productId])) {
+                        total += parseFloat(productPrices[productId]);
+                    }
+                }
+            });
+        }
+        
+        // Calculate services total
+        if (serviceSelect) {
+            const selectedServices = Array.from(serviceSelect.selectedOptions);
+            selectedServices.forEach(function(option) {
+                if (option.value) {
+                    const serviceId = parseInt(option.value);
+                    if (servicePrices[serviceId] !== undefined && !isNaN(servicePrices[serviceId])) {
+                        total += parseFloat(servicePrices[serviceId]);
+                    }
+                }
+            });
+        }
+        
+        // Update total price input - MoneyType field structure
+        const totalPriceInput = document.getElementById('total-price-input');
+        if (totalPriceInput) {
+            totalPriceInput.value = total.toFixed(2);
+        }
+        
+        // Also update any input with name containing totalPrice
+        const moneyInputs = document.querySelectorAll('input[name*="totalPrice"]');
+        moneyInputs.forEach(function(input) {
+            if (input.type !== 'hidden' || input.id === 'total-price-input') {
+                input.value = total.toFixed(2);
+            }
+        });
+        
+        // Force update by triggering input event
+        if (totalPriceInput) {
+            totalPriceInput.dispatchEvent(new Event('input', { bubbles: true }));
+            totalPriceInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+    
+    if (productSelect) {
+        productSelect.addEventListener('change', calculateTotal);
+    }
+    
+    if (serviceSelect) {
+        serviceSelect.addEventListener('change', calculateTotal);
+    }
+    
+    // Calculate initial total
+    calculateTotal();
+    
+    // Recalculate before form submission to ensure value is set
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            calculateTotal();
+        });
+    }
+});
+</script>
+
+<style>
+.custom-multiselect-wrapper {
+    position: relative;
+}
+
+.custom-multiselect {
+    position: relative;
+    width: 100%;
+}
+
+.custom-multiselect-selected {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    background-color: #fff;
+    cursor: pointer;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.custom-multiselect-selected:hover {
+    border-color: #86b7fe;
+}
+
+.custom-multiselect-selected.active {
+    border-color: var(--admin-table-header);
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(31, 41, 55, 0.25);
+}
+
+.custom-multiselect-selected .placeholder {
+    color: #6c757d;
+}
+
+.custom-multiselect-selected .selected-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.custom-multiselect-selected .selected-item {
+    background-color: var(--admin-table-header);
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.custom-multiselect-selected .selected-item .remove {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.custom-multiselect-selected .selected-item .remove:hover {
+    color: #ffc107;
+}
+
+.custom-multiselect-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 0.25rem;
+}
+
+.custom-multiselect-search {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.custom-multiselect-options {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.custom-multiselect-option {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.custom-multiselect-option:hover {
+    background-color: #f8f9fa;
+}
+
+.custom-multiselect-option input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.custom-multiselect-option.selected {
+    background-color: #e7f3ff;
+}
+
+.custom-multiselect-option.selected:hover {
+    background-color: #d0e7ff;
+}
+
+.card {
+    border: 1px solid var(--admin-border);
+    border-radius: 0.5rem;
+}
+.card-header {
+    padding: 1.25rem 1.5rem;
+}
+</style>
+{% endblock %}
+

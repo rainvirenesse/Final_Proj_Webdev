@@ -1,0 +1,41 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Services{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Services</h1>
+        <a href="{{ path('admin_service_new') }}" class="btn btn-dark">+ Add New Service</a>
+    </div>
+    
+    {% set headers = ['ID', 'Name', 'Price', 'Duration (Hours)', 'Status', 'Revisions', 'Created'] %}
+    {% set rows = [] %}
+    
+    {% for service in services %}
+        {% set statusBadge = '<span class="badge ' ~ 
+            (service.status == 'ACTIVE' ? 'badge-admin-success' : 
+             (service.status == 'COMPLETED' ? 'badge-admin-info' : 'badge-admin-warning')) ~ 
+            '">' ~ service.status ~ '</span>' %}
+        {% set row = [
+            service.id,
+            service.name,
+            '₱' ~ service.price|number_format(2, '.', ','),
+            service.durationInHours,
+            statusBadge,
+            service.revisions,
+            service.createdAt|date('Y-m-d')
+        ] %}
+        {% set rows = rows|merge([row]) %}
+    {% endfor %}
+    
+    {% include 'admin/partials/_tables.html.twig' with {
+        'tableId': 'servicesTable',
+        'headers': headers,
+        'rows': rows,
+        'editRoute': 'admin_service_edit',
+        'showRoute': 'admin_service_show',
+        'deleteRoute': 'admin_service_delete'
+    } %}
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Users{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Users</h1>
+        <a href="{{ path('admin_user_new') }}" class="btn btn-dark">+ Add New User</a>
+    </div>
+        {% set headers = ['ID', 'Username', 'Email', 'Roles', 'Status', 'Created'] %}
+        {% set rows = [] %}
+
+        {% for user in users %}
+            {% set statusBadge = '<span class="badge ' ~ 
+                (user.status == 'ACTIVE' ? 'badge-admin-success' : 
+                 (user.status == 'DISABLED' ? 'badge-admin-danger' : 'badge-admin-warning')) ~ 
+                '">' ~ user.status ~ '</span>' %}
+            {% set row = [
+                user.id,
+                user.username ?? 'N/A',
+                user.email,
+                user.roles|join(', '),
+                statusBadge,
+                user.createdAt|date('Y-m-d')
+            ] %}
+            {% set rows = rows|merge([row]) %}
+        {% endfor %}
+
+        {% include 'admin/partials/_tables.html.twig' with {
+            'tableId': 'usersTable',
+            'headers': headers,
+            'rows': rows,
+            'editRoute': 'admin_user_edit',
+            'showRoute': 'admin_user_show',
+            'deleteRoute': 'admin_user_delete'
+        } %}
+
+</div>
+{% endblock %}

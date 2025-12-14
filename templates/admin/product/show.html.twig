@@ -1,0 +1,104 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">Product Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    <table class="table table-borderless mb-0 show-details-table">
+                        <tr>
+                            <th width="30%" class="text-muted fw-semibold">ID:</th>
+                            <td class="fw-medium">{{ product.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Name:</th>
+                            <td>{{ product.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Description:</th>
+                            <td>{{ product.description ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Price:</th>
+                            <td class="fw-semibold text-success">₱{{ product.price|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Status:</th>
+                            <td>
+                                <span class="badge {{ product.status == 'ACTIVE' ? 'badge-admin-success' : (product.status == 'OUT_OF_STOCK' ? 'badge-admin-danger' : 'badge-admin-warning') }} px-3 py-1">
+                                    {{ product.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Category:</th>
+                            <td>{{ product.category ?? 'N/A' }}</td>
+                        </tr>
+                        {% if product.image %}
+                        <tr>
+                            <th class="text-muted fw-semibold">Image:</th>
+                            <td>
+                                <img src="{{ asset(product.image) }}" class="rounded shadow-sm" style="max-width: 200px; max-height: 200px; object-fit: cover; border: 2px solid var(--admin-border);">
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th class="text-muted fw-semibold">Created At:</th>
+                            <td>{{ product.createdAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Updated At:</th>
+                            <td>{{ product.updatedAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-footer bg-white border-top">
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('admin_product_edit', {'id': product.id}) }}" class="btn btn-dark">Edit</a>
+                        <a href="{{ path('admin_product_index') }}" class="btn btn-outline-secondary">← Back to list</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .show-details-table tr {
+        border-bottom: 1px solid var(--admin-border-lighter);
+        transition: background-color 0.2s ease;
+    }
+    .show-details-table tr:hover {
+        background-color: var(--admin-bg-light);
+    }
+    .show-details-table tr:last-child {
+        border-bottom: none;
+    }
+    .show-details-table th {
+        padding: 1rem 1.25rem 1rem 0;
+        vertical-align: middle;
+    }
+    .show-details-table td {
+        padding: 1rem 0;
+        vertical-align: middle;
+        color: var(--admin-text-dark);
+    }
+    .card {
+        border: 1px solid var(--admin-border);
+        border-radius: 0.5rem;
+    }
+    .card-header {
+        padding: 1.25rem 1.5rem;
+    }
+    .card-footer {
+        padding: 1.25rem 1.5rem;
+    }
+</style>
+{% endblock %}
+
