@@ -6,6 +6,9 @@ use App\Repository\OrderItemRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use ApiPlatform\Metadata\ApiResource;
+
+#[ApiResource]
 
 #[ORM\Entity(repositoryClass: OrderItemRepository::class)]
 #[ORM\HasLifecycleCallbacks]

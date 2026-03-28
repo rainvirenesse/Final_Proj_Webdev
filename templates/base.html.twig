@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{# <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -15,5 +15,112 @@
     </head>
     <body>
         {% block body %}{% endblock %}
+    </body>
+</html> #}
+{# <!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html> #}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link rel="stylesheet" href="{{ asset('styles/rain.css') }}">
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+
+        {% block navbar %}
+        <nav>
+            <a href="{{ path('landing') }}" class="nav-logo">
+                RAIN<span>Fashion At Your Feet</span>
+            </a>
+            <ul>
+                <li><a href="{{ path('landing') }}">Home</a></li>
+                <li><a href="{{ path('landing') }}#about">About</a></li>
+                <li><a href="{{ path('landing') }}#shop">Shop</a></li>
+                <li><a href="{{ path('landing') }}#testimonials">Testimonials</a></li>
+                <li><a href="{{ path('landing') }}#faq">FAQ</a></li>
+            </ul>
+        </nav>
+        {% endblock %}
+
+        {% block body %}{% endblock %}
+
+        {% block footer %}
+        <footer>
+            <div class="footer-top">
+                <div>
+                    <div class="footer-logo">RAIN</div>
+                    <div class="footer-logo-tag">Fashion At Your Feet</div>
+                    <p>We ship nationwide across the Philippines.</p>
+                </div>
+                <div>
+                    <h4>Navigate</h4>
+                    <ul>
+                        <li><a href="{{ path('landing') }}">Home</a></li>
+                        <li><a href="{{ path('landing') }}#about">About</a></li>
+                        <li><a href="{{ path('landing') }}#shop">Shop</a></li>
+                        <li><a href="{{ path('landing') }}#testimonials">Testimonials</a></li>
+                        <li><a href="{{ path('landing') }}#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Policies</h4>
+                    <ul>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Returns &amp; Refunds</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Address</h4>
+                    <p>Unit 4, Downtown Commercial Hub<br>
+                       Rizal Street, Dumaguete City,<br>
+                       Negros Oriental</p>
+                    <p style="margin-top:.8rem;">
+                        +63 912 345 6789<br>
+                        hello@rain.ph
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ "now"|date("Y") }} RAIN. All Rights Reserved.</p>
+                <div class="social-links">
+                    <a href="#">f</a>
+                    <a href="#">in</a>
+                    <a href="#">ig</a>
+                </div>
+            </div>
+        </footer>
+        {% endblock %}
+
     </body>
 </html>

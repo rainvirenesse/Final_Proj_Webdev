@@ -20,7 +20,8 @@ class SecurityController extends AbstractController
     ) {
     }
 
-    #[Route(path: '/login', name: 'login')]
+     #[Route(path: '/login', name: 'login')]
+    // #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {

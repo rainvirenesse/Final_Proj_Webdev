@@ -25,4 +25,17 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
+    'jquery' => [
+        'version' => '4.0.0',
+    ],
+    'datatables.net' => [
+        'version' => '2.3.7',
+    ],
+    'datatables.net-dt' => [
+        'version' => '2.3.7',
+    ],
+    'datatables.net-dt/css/dataTables.dataTables.min.css' => [
+        'version' => '2.3.7',
+        'type' => 'css',
+    ],
 ];

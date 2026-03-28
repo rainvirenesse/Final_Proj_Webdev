@@ -220,6 +220,16 @@ final class CustomerOrderController extends AbstractController
             'order' => $order,
         ]);
     }
+     #[Route('/{id}', name: 'staff_customer_order_edit', methods: ['GET'])]
+    public function edit(CustomerOrder $order): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
+        
+        // Staff can view all orders
+        return $this->render('staff/order/edit.html.twig', [
+            'order' => $order,
+        ]);
+    }
     
     private function generateUniqueOrderNumber(EntityManagerInterface $entityManager): string
     {

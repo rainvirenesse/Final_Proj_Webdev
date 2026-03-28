@@ -4,59 +4,64 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Service\EmailVerificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;  // NEW - For generating absolute URLs
+
 
 class RegistrationController extends AbstractController
 {
-    public function __construct(
-        private UserPasswordHasherInterface $passwordHasher,
-        private EntityManagerInterface $entityManager
-    ) {
-    }
-
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request): Response
-    {
-        // Redirect if already logged in
-        if ($this->getUser()) {
-            return $this->redirectToRoute('admin_dashboard');
-        }
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
+        EntityManagerInterface $entityManager,
+        EmailVerificationService $emailVerificationService  // ADDED
+    ): Response {
 
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                // Hash the password
-                $plainPassword = $form->get('password')->getData();
-                $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
-                $user->setPassword($hashedPassword);
+            /** @var string $plainPassword */
+            $plainPassword = $form->get('password')->getData();
 
-                // Set default role and status
-                $user->setRoles(['ROLE_USER']);
-                $user->setStatus(User::STATUS_ACTIVE);
-                // createdAt is set automatically by the prePersist lifecycle callback
+            // encode the plain password
+            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
 
-                $this->addFlash('success', 'Registration successful! You can now log in.');
+            // Generate verification token
+            $verificationToken = $emailVerificationService->generateVerificationToken();
+            $user->setVerificationToken($verificationToken);
+            $user->setIsVerified(false);
 
-                return $this->redirectToRoute('login');
-            } catch (\Exception $e) {
-                $this->addFlash('danger', 'An error occurred during registration: ' . $e->getMessage());
-            }
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            // do anything else you need here, like send an email
+            // Generate verification URL
+            $verificationUrl = $this->generateUrl(
+                'app_verify_email',
+                ['token' => $verificationToken],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+
+            // Send verification email
+            $emailVerificationService->sendVerificationEmail($user, $verificationUrl);
+
+            $this->addFlash('success', 'Registration successful! Please check your email to verify your account.');
+
+            return $this->redirectToRoute('login');
         }
 
         return $this->render('registration/register.html.twig', [
-            'registrationForm' => $form->createView(),
+            'registrationForm' => $form,
         ]);
     }
 }
-

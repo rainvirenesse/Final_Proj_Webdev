@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RAIN — Fashion At Your Feet{% endblock %}
+{% block description %}Step into confidence. Every pair crafted to blend elegance with everyday comfort.{% endblock %}
+
+{% block body %}
+
+{# ── HERO ─────────────────────────────────────────── #}
+<section class="hero" style="padding:0;">
+    <div class="hero-text">
+        <p class="hero-eyebrow">New Collection 2025</p>
+        <h1 class="hero-title">Fashion<br><strong>At Your Feet</strong></h1>
+        <p class="hero-sub">Step into confidence. Every pair crafted to blend elegance with everyday comfort.</p>
+        <div>
+            <a href="#shop" class="btn btn-wine">View Now</a>
+            <a href="#collection" class="btn btn-outline">Explore</a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <img src="{{ asset('images/hero.jpg') }}" alt="RAIN shoes hero">
+        <div class="hero-badge">
+            <p>Fashion At Your Feet</p>
+            <a href="#shop">View Now &rarr;</a>
+        </div>
+    </div>
+</section>
+
+{# ── ABOUT ────────────────────────────────────────── #}
+<section class="about" id="about">
+    <div>
+        <h2 class="about-label">About</h2>
+        <p>{{ about }}</p>
+    </div>
+    <div class="about-image">
+        <img src="{{ asset('images/about.jpg') }}" alt="About RAIN">
+    </div>
+</section>
+
+{# ── COLLECTION ───────────────────────────────────── #}
+<section class="collection" id="collection">
+    <h2 class="section-title">Modern Muse Collection</h2>
+    <div class="section-rule"></div>
+    <div class="collection-grid">
+        {% for item in collections %}
+            <div class="coll-card fade-up">
+                <div class="coll-card-img">
+                    <img src="{{ asset('images/' ~ item.image) }}" alt="{{ item.name }}">
+                </div>
+                <div class="coll-card-body">
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.subtitle }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="collection-cta">
+        <a href="#shop" class="btn btn-wine">More</a>
+    </div>
+</section>
+
+{# ── FEATURED PRODUCTS ────────────────────────────── #}
+<section class="products" id="shop">
+    <h2 class="section-title">Featured Products</h2>
+    <div class="section-rule"></div>
+    <div class="products-grid">
+        {% for product in products %}
+            <div class="product-card fade-up">
+                <div class="product-card-img">
+                    <img src="{{ asset('images/' ~ product.image) }}" alt="{{ product.name }}">
+                    {% if product.tag %}
+                        <span class="product-tag">{{ product.tag }}</span>
+                    {% endif %}
+                </div>
+                <h4>{{ product.name }}</h4>
+                <p>{{ product.description }}</p>
+                <span class="product-price">&#8369;{{ product.price|number_format(2) }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="products-cta">
+        <a href="#" class="btn btn-wine">See More</a>
+    </div>
+</section>
+
+{# ── SUBSCRIBE ────────────────────────────────────── #}
+<section class="subscribe">
+    <div class="subscribe-text">
+        <h2><em>Subscribe</em> <strong>for a special discount</strong></h2>
+        <p>Join the RAIN family and get exclusive offers, early access to new collections, and style inspiration delivered to your inbox.</p>
+    </div>
+    <div>
+        <div class="subscribe-form">
+            <input type="text" placeholder="Name">
+            <input type="email" placeholder="Email">
+            <button class="btn btn-light">Sign Up</button>
+        </div>
+    </div>
+</section>
+
+{# ── TESTIMONIALS ─────────────────────────────────── #}
+<section class="testimonials" id="testimonials">
+    <h2 class="section-title">What Our Customers Say</h2>
+    <div class="section-rule"></div>
+    <div class="testimonials-grid">
+        {% for testimonial in testimonials %}
+            <div class="testi-card">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>"{{ testimonial.quote }}"</blockquote>
+                <cite>&mdash; {{ testimonial.author }}</cite>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{# ── FAQ ──────────────────────────────────────────── #}
+<section class="faq" id="faq">
+    <div class="faq-left">
+        <h2>FAQ Section</h2>
+        <div class="section-rule" style="margin:1rem 0 1.5rem;"></div>
+        <p>Got questions? We've listed the answers to keep your shopping smooth and worry-free.</p>
+        {% for faq in faqs %}
+            <div class="faq-item {% if loop.first %}open{% endif %}">
+                <div class="faq-q">{{ faq.question }}</div>
+                <div class="faq-a">{{ faq.answer }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+        <div class="faq-form">
+            <h3>We'd love to hear from you</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="your@email.com">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea rows="5" placeholder="Your message..."></textarea>
+            </div>
+            <button class="btn btn-wine" style="width:100%;text-align:center;">Submit</button>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
