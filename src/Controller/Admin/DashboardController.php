@@ -25,7 +25,7 @@ final class DashboardController extends AbstractController
         ServiceRepository $serviceRepository,
         ProductRepository $productRepository
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         // Get statistics
         $totalUsers = count($userRepository->findAll());
         $allOrders = $orderRepository->findAll();
@@ -52,6 +52,7 @@ final class DashboardController extends AbstractController
         $totalServices = count($serviceRepository->findAll());
         $totalProducts = $productRepository->countProducts();
         $activeProducts = $productRepository->countActiveProducts();
+        $totalProductStock = $productRepository->sumStock();
         
         // Count staff users
         $allUsers = $userRepository->findAll();
@@ -82,6 +83,7 @@ final class DashboardController extends AbstractController
             'completedOrders' => $completedOrders,
             'totalProducts' => $totalProducts,
             'activeProducts' => $activeProducts,
+            'totalProductStock' => $totalProductStock,
             'totalServices' => $totalServices,
             'recentOrders' => $recentOrders,
             'recentActivities' => $recentActivities,

@@ -1,0 +1,13 @@
+# Set GOOGLE_OAUTH_REDIRECT_URI to the same value as "Authorized redirect URIs"
+# in Google Cloud (Web application client). Full URL, no trailing slash. The
+# bundle accepts a URL here (see ProviderFactory::createProvider).
+knpu_oauth2_client:
+    clients:
+        google:
+            type: google
+            client_id: '%env(GOOGLE_CLIENT_ID)%'
+            client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
+            redirect_route: '%env(GOOGLE_OAUTH_REDIRECT_URI)%'
+            redirect_params: {}
+
+            # configure your clients as described here: https://github.com/knpuniversity/oauth2-client-bundle#configuration

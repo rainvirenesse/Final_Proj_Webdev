@@ -40,7 +40,7 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
             if (in_array('ROLE_ADMIN', $roles)) {
                 return new RedirectResponse($this->router->generate('admin_dashboard'));
             } elseif (in_array('ROLE_STAFF', $roles)) {
-                return new RedirectResponse($this->router->generate('staff_product_index'));
+                return new RedirectResponse($this->router->generate('admin_dashboard'));
             } else {
                 return new RedirectResponse($this->router->generate('profile_show'));
             }

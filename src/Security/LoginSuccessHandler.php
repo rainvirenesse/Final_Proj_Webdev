@@ -26,7 +26,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         if (in_array('ROLE_ADMIN', $roles)) {
             return new RedirectResponse($this->router->generate('admin_dashboard'));
         } elseif (in_array('ROLE_STAFF', $roles)) {
-            return new RedirectResponse($this->router->generate('staff_product_index'));
+            return new RedirectResponse($this->router->generate('admin_dashboard'));
         }
         
         // Default redirect for other users

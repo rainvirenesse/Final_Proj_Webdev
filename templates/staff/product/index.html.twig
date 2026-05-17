@@ -3,12 +3,12 @@
 {% block title %}Products{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-3 admin-workspace">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4">Products</h1>
         <a href="{{ path('staff_product_new') }}" class="btn btn-dark">+ Add New Product</a>
     </div>
-        {% set headers = ['ID', 'Name', 'Price', 'Status', 'Category'] %}
+        {% set headers = ['ID', 'Name', 'Price', 'Stock', 'Status', 'Category'] %}
         {% set rows = [] %}
 
         {% for product in products %}
@@ -23,6 +23,7 @@
                     product.id,
                     product.name,
                     '₱' ~ product.price|number_format(2, '.', ','),
+                    product.stock,
                     statusBadge,
                     product.category ?? 'N/A'
                 ],
@@ -31,8 +32,8 @@
             {% set rows = rows|merge([row]) %}
         {% endfor %}
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body p-0">
+        <div class="card shadow-sm mb-4 admin-datatable-card">
+            <div class="card-body p-0 admin-table-scroll admin-table-scroll--inset">
                 <table id="productsTable" class="w-full">
                     <thead>
                         <tr>
@@ -93,23 +94,39 @@
 
     #productsTable thead th {
         border: none !important;
-        background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%) !important;
-        color: var(--admin-text-white) !important;
+        background: linear-gradient(180deg, var(--rain-blush) 0%, var(--rain-warm-white) 55%, #f7f0ec 100%) !important;
+        color: var(--rain-wine-dark) !important;
         font-weight: 600;
         font-size: 0.8125rem;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
         padding: 1rem 1.25rem;
         position: relative;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        box-shadow: inset 0 -1px 0 rgba(122, 37, 53, 0.15);
+        text-shadow: none;
     }
 
     #productsTable thead th:first-child {
+        padding-left: 1.85rem;
         border-radius: 0.5rem 0 0 0;
+    }
+
+    #productsTable thead th:not(:last-child) {
+        box-shadow: inset -1px 0 0 rgba(122, 37, 53, 0.12), inset 0 -1px 0 rgba(122, 37, 53, 0.15);
     }
 
     #productsTable thead th:last-child {
         border-radius: 0 0.5rem 0 0;
+    }
+
+    #productsTable thead th.sorting:before,
+    #productsTable thead th.sorting:after,
+    #productsTable thead th.sorting_asc:before,
+    #productsTable thead th.sorting_asc:after,
+    #productsTable thead th.sorting_desc:before,
+    #productsTable thead th.sorting_desc:after {
+        color: var(--rain-wine) !important;
+        opacity: 0.65;
     }
 
     #productsTable tbody td {
@@ -262,7 +279,9 @@
                         "paging": true,
                         "info": true,
                         "autoWidth": false,
-                        "responsive": true,
+                        "responsive": false,
+                        "scrollX": true,
+                        "scrollCollapse": true,
                         "language": {
                             "search": "Search:",
                             "lengthMenu": "Show _MENU_ entries",

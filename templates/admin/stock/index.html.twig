@@ -1,0 +1,66 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Stock{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-3 admin-workspace">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h1 class="h4 mb-0">Stock management</h1>
+            <p class="text-muted small mb-0">Movement records adjust on-hand quantities on each product.</p>
+        </div>
+        <a href="{{ path('admin_stock_new') }}" class="btn btn-dark">+ New stock record</a>
+    </div>
+
+    {% set headers = ['ID', 'Product', 'Price', 'Category', 'Status', 'Change', 'Current stock', 'Recorded', 'Recorded by', 'Last edited'] %}
+    {% set rows = [] %}
+    {% for record in records %}
+        {% set p = record.product %}
+        {% set delta = record.quantityDelta %}
+        {% set deltaHtml = delta > 0
+            ? '<span class="badge badge-admin-success">+' ~ delta ~ '</span>'
+            : '<span class="badge badge-admin-danger">' ~ delta ~ '</span>' %}
+        {% set statusBadge = '<span class="badge ' ~
+            (p.status == 'ACTIVE' ? 'badge-admin-success' :
+             (p.status == 'OUT_OF_STOCK' ? 'badge-admin-danger' : 'badge-admin-warning')) ~
+            '">' ~ p.status|e('html') ~ '</span>' %}
+        {% set u = record.createdBy %}
+        {% if u %}
+            {% set roleLabel = 'ROLE_ADMIN' in u.roles ? 'Admin' : ('ROLE_STAFF' in u.roles ? 'Staff' : 'User') %}
+            {% set by = (roleLabel ~ ' · ' ~ u.email)|e('html') %}
+        {% else %}
+            {% set by = '—' %}
+        {% endif %}
+        {% set eu = record.updatedBy %}
+        {% if record.updatedAt and eu %}
+            {% set editRole = 'ROLE_ADMIN' in eu.roles ? 'Admin' : ('ROLE_STAFF' in eu.roles ? 'Staff' : 'User') %}
+            {% set lastEdited = (record.updatedAt|date('Y-m-d H:i') ~ ' · ' ~ editRole ~ ' · ' ~ eu.email)|e('html') %}
+        {% else %}
+            {% set lastEdited = '—' %}
+        {% endif %}
+        {% set row = [
+            record.id,
+            ('#' ~ p.id ~ ' — ' ~ p.name)|e('html'),
+            '₱' ~ p.price|number_format(2, '.', ','),
+            (p.category ?? '—')|e('html'),
+            statusBadge,
+            deltaHtml,
+            p.stock,
+            record.createdAt|date('Y-m-d H:i'),
+            by,
+            lastEdited
+        ] %}
+        {% set rows = rows|merge([row]) %}
+    {% endfor %}
+
+    {% include 'admin/partials/_tables.html.twig' with {
+        'tableId': 'stockRecordsTable',
+        'headers': headers,
+        'rows': rows,
+        'editRoute': 'admin_stock_edit',
+        'showRoute': 'admin_stock_show',
+        'deleteRoute': 'admin_stock_delete',
+        'dtOrder': [[7, 'desc'], [0, 'desc']]
+    } %}
+</div>
+{% endblock %}

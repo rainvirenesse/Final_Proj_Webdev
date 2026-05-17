@@ -8,25 +8,43 @@
         border-spacing: 0 !important;
     }
 
+    /* Header: same warm blush tone as the main panel / sidebar edge */
     #{{ tableId }} thead th {
         border: none !important;
-        background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%) !important;
-        color: var(--admin-text-white) !important;
+        background: linear-gradient(180deg, var(--rain-blush) 0%, var(--rain-warm-white) 55%, #f7f0ec 100%) !important;
+        color: var(--rain-wine-dark) !important;
         font-weight: 600;
         font-size: 0.8125rem;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 1rem 1.25rem;
+        letter-spacing: 0.08em;
+        padding: 1rem 1.25rem 1rem 1.25rem;
         position: relative;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        box-shadow: inset 0 -1px 0 rgba(122, 37, 53, 0.15);
+        text-shadow: none;
     }
 
     #{{ tableId }} thead th:first-child {
+        padding-left: 1.85rem;
         border-radius: 0.5rem 0 0 0;
+    }
+
+    #{{ tableId }} thead th:not(:last-child) {
+        box-shadow: inset -1px 0 0 rgba(122, 37, 53, 0.12), inset 0 -1px 0 rgba(122, 37, 53, 0.15);
     }
 
     #{{ tableId }} thead th:last-child {
         border-radius: 0 0.5rem 0 0;
+    }
+
+    /* DataTables sort carets — readable on light header */
+    #{{ tableId }} thead th.sorting:before,
+    #{{ tableId }} thead th.sorting:after,
+    #{{ tableId }} thead th.sorting_asc:before,
+    #{{ tableId }} thead th.sorting_asc:after,
+    #{{ tableId }} thead th.sorting_desc:before,
+    #{{ tableId }} thead th.sorting_desc:after {
+        color: var(--rain-wine) !important;
+        opacity: 0.65;
     }
 
     #{{ tableId }} tbody td {
@@ -169,8 +187,8 @@
     }
 </style>
 
-<div class="card shadow-sm mb-4">
-    <div class="card-body p-0">
+<div class="card shadow-sm mb-4 admin-datatable-card">
+    <div class="card-body p-0 admin-table-scroll admin-table-scroll--inset">
         <table id="{{ tableId }}" class="w-full">
             <thead>
                 <tr>
@@ -227,12 +245,14 @@
                         "pageLength": 10,
                         "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
                         "ordering": true,
-                        "order": [[0, "asc"]],
+                        "order": {{ dtOrder|default([[0, 'asc']])|json_encode|raw }},
                         "searching": true,
                         "paging": true,
                         "info": true,
                         "autoWidth": false,
-                        "responsive": true,
+                        "responsive": false,
+                        "scrollX": true,
+                        "scrollCollapse": true,
                         "language": {
                             "search": "Search:",
                             "lengthMenu": "Show _MENU_ entries",

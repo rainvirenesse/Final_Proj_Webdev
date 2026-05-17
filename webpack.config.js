@@ -12,6 +12,10 @@ Encore
     .cleanupOutputBeforeBuild()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
+    .copyFiles({
+    from: './assets/image',
+    to: 'images/[path][name].[ext]',
+})
 ;
 
 module.exports = Encore.getWebpackConfig();

@@ -31,9 +31,11 @@ class SecurityController extends AbstractController
             if (in_array('ROLE_ADMIN', $roles)) {
                 return $this->redirectToRoute('admin_dashboard');
             } elseif (in_array('ROLE_STAFF', $roles)) {
-                return $this->redirectToRoute('staff_product_index');
+                return $this->redirectToRoute('admin_dashboard');
+            } else {
+                return $this->redirectToRoute('user_dashboard');
             }
-            return $this->redirectToRoute('admin_dashboard');
+            
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();

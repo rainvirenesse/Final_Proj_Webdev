@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RAIN — All Products{% endblock %}
+
+{% block body %}
+<section class="products-page-hero">
+    <div class="products-page-hero-inner">
+        <p class="hero-eyebrow">Product Catalog</p>
+        <h1 class="hero-title">All <strong>Products</strong></h1>
+        <p class="hero-sub">Browse every collection and featured style in one place.</p>
+        <a href="{{ path('landing') }}#shop" class="btn btn-outline">Back to Landing</a>
+    </div>
+</section>
+
+<section class="collection" id="all-collections">
+    <h2 class="section-title">Modern Muse Collections</h2>
+    <div class="section-rule"></div>
+    <div class="collection-grid">
+        {% for item in collections %}
+            <div class="coll-card reveal" data-reveal>
+                <div class="coll-card-img">
+                    <img src="{{ asset('build/images/' ~ item.image) }}" alt="{{ item.name }}">
+                </div>
+                <div class="coll-card-body">
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.subtitle }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="products" id="all-products">
+    <h2 class="section-title">All Featured Products</h2>
+    <div class="section-rule"></div>
+    <div class="products-grid">
+        {% for product in products %}
+            <a href="{{ path('shop_product_show', { slug: product.slug }) }}" class="product-card product-card-link reveal" data-reveal>
+                <div class="product-card-img">
+                    <img src="{{ asset('build/images/' ~ product.image) }}" alt="{{ product.name }}"{% if product.imageStyle is defined %} style="{{ product.imageStyle }}"{% endif %}>
+                    {% if product.tag %}
+                        <span class="product-tag">{{ product.tag }}</span>
+                    {% endif %}
+                </div>
+                <h4>{{ product.name }}</h4>
+                <p>{{ product.description }}</p>
+                <span class="product-price">&#8369;{{ product.price|number_format(2) }}</span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,4 +1,9 @@
 security:
+    # Admins implicitly have staff capabilities (used for shared admin routes).
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_STAFF, ROLE_USER]
+        ROLE_STAFF: [ROLE_USER]
+
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         App\Entity\User:
@@ -10,6 +15,10 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        app_username_provider:
+            entity:
+                class: App\Entity\User
+                property: username
 
     firewalls:
         dev:
@@ -21,28 +30,51 @@ security:
             pattern: ^/api/login
             stateless: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
             json_login:
                 check_path: /api/login
                 username_path: email
-                password_path: password
+                # password_path: password
+
+        api_public_registration:
+            pattern: ^/api/(register|verify-email)
+            stateless: true
+            security: false
+
+        api_public:
+            # Public mobile-consumable endpoints (catalog + onboarding).
+            # Keep business/admin API routes protected by api_platform JWT firewall.
+            pattern: ^/api/(register|verify-email|products|services|order_items)(?:/|\.|$)
+            stateless: true
+            security: false
+
+        api_entrypoint_public:
+            # Disabled: keep /api protected.
+            pattern: ^$
+            stateless: true
+            security: false
 
         api_platform:
             pattern: ^/api
             stateless: true
-            provider: app_user_provider
+            provider: app_username_provider
+            user_checker: App\Security\UserChecker
             jwt: ~
 
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
+            custom_authenticators:                        
+                - App\Security\GoogleAuthenticator 
             form_login:
                 login_path: /login
                 check_path: /login
-                default_target_path: /LandingPage
+                # default_target_path: /LandingPage
                 # csrf_token_generator: security.csrf.token_manager
-                # success_handler: App\Security\LoginSuccessHandler
+                success_handler: App\Security\LoginSuccessHandler
             logout:
-                path: app_logout
+                path: logout
                 # where to redirect after logout
                 target: login
 
@@ -54,10 +86,35 @@ security:
 
     # Note: Only the first matching rule is applied
     access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/verify-email, roles: PUBLIC_ACCESS }
+        - { path: ^/LandingPage, roles: PUBLIC_ACCESS }
+        - { path: ^/about, roles: PUBLIC_ACCESS }
+        - { path: ^/contact, roles: PUBLIC_ACCESS }
+        - { path: ^/shop, roles: PUBLIC_ACCESS }
+        - { path: ^/auth/google, roles: PUBLIC_ACCESS }
+        # Admin-only areas
+        - { path: ^/admin/users, roles: ROLE_ADMIN }
+        - { path: ^/admin/activity-logs, roles: ROLE_ADMIN }
+        # Staff and admins (hierarchy gives ROLE_STAFF to ROLE_ADMIN)
+        - { path: ^/admin/dashboard, roles: ROLE_STAFF }
+        - { path: ^/admin/products, roles: ROLE_STAFF }
+        - { path: ^/admin/stock, roles: ROLE_STAFF }
+        - { path: ^/admin/orders, roles: ROLE_STAFF }
+        - { path: ^/admin/services, roles: ROLE_STAFF }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/staff, roles: ROLE_STAFF }
+        - { path: ^/user, roles: ROLE_USER }
+        
+        # - { path: ^/api$, roles: IS_AUTHENTICATED }
+        - { path: ^/api/docs, roles: IS_AUTHENTICATED }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/google/mobile, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/verify-email, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED }
-        - { path: ^/user, roles: IS_AUTHENTICATED }
+        # - { path: ^/user, roles: IS_AUTHENTICATED }
         - { path: ^/activity_log, roles: IS_AUTHENTICATED }
         - { path: ^/product, roles: IS_AUTHENTICATED }
         - { path: ^/customer, roles: IS_AUTHENTICATED }

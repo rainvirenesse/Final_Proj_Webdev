@@ -21,7 +21,7 @@ final class CustomerOrderController extends AbstractController
     #[Route(name: 'admin_customer_order_index', methods: ['GET'])]
     public function index(CustomerOrderRepository $orderRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         return $this->render('admin/order/index.html.twig', [
             'orders' => $orderRepository->findAll(),
@@ -35,7 +35,7 @@ final class CustomerOrderController extends AbstractController
         ProductRepository $productRepository,
         ServiceRepository $serviceRepository
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         $order = new CustomerOrder();
         $order->setStatus(CustomerOrder::STATUS_PENDING); // Set default status
@@ -257,7 +257,7 @@ final class CustomerOrderController extends AbstractController
     #[Route('/{id}', name: 'admin_customer_order_show', methods: ['GET'])]
     public function show(CustomerOrder $order): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         return $this->render('admin/order/show.html.twig', [
             'order' => $order,
@@ -272,7 +272,7 @@ final class CustomerOrderController extends AbstractController
         ProductRepository $productRepository,
         ServiceRepository $serviceRepository
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         // Check if order is completed - prevent editing
         if ($order->getStatus() === CustomerOrder::STATUS_COMPLETED) {
@@ -503,7 +503,7 @@ final class CustomerOrderController extends AbstractController
     #[Route('/{id}', name: 'admin_customer_order_delete', methods: ['POST'])]
     public function delete(Request $request, CustomerOrder $order, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         if ($this->isCsrfTokenValid('delete'.$order->getId(), $request->request->get('_token'))) {
             $entityManager->remove($order);

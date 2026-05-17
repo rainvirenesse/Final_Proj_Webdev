@@ -4,35 +4,74 @@
 {% block description %}Step into confidence. Every pair crafted to blend elegance with everyday comfort.{% endblock %}
 
 {% block body %}
-
-{# ── HERO ─────────────────────────────────────────── #}
-<section class="hero" style="padding:0;">
-    <div class="hero-text">
-        <p class="hero-eyebrow">New Collection 2025</p>
-        <h1 class="hero-title">Fashion<br><strong>At Your Feet</strong></h1>
-        <p class="hero-sub">Step into confidence. Every pair crafted to blend elegance with everyday comfort.</p>
-        <div>
-            <a href="#shop" class="btn btn-wine">View Now</a>
-            <a href="#collection" class="btn btn-outline">Explore</a>
+{# Flash feedback for form submissions #}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash flash-{{ label }}" role="status" aria-live="polite">
+            {{ message }}
         </div>
+    {% endfor %}
+{% endfor %}
+
+{# ── HERO — full-bleed photo (back) → color wash → text & CTAs (front) ── #}
+<section class="hero" id="top">
+    <div class="hero-photo" aria-hidden="true">
+        <img src="{{ asset('build/images/mo.png') }}" alt="">
     </div>
-    <div class="hero-image">
-        <img src="{{ asset('images/hero.jpg') }}" alt="RAIN shoes hero">
-        <div class="hero-badge">
-            <p>Fashion At Your Feet</p>
-            <a href="#shop">View Now &rarr;</a>
+    <div class="hero-inner">
+        <div class="hero-text reveal" data-reveal>
+            <p class="hero-eyebrow">New Collection 2025</p>
+            <h1 class="hero-title">Fashion<br><strong>At Your Feet</strong></h1>
+            <p class="hero-sub">Step into confidence. Every pair crafted to blend elegance with everyday comfort.</p>
+            <div class="hero-actions">
+                <a href="#shop" class="btn btn-wine btn-hero-primary">View Now</a>
+                <a href="#collection" class="btn btn-outline btn-hero-secondary">Explore</a>
+            </div>
         </div>
     </div>
 </section>
 
 {# ── ABOUT ────────────────────────────────────────── #}
-<section class="about" id="about">
-    <div>
-        <h2 class="about-label">About</h2>
-        <p>{{ about }}</p>
+<section class="about" id="about" aria-labelledby="about-heading">
+    <div class="about-wrap">
+        <div class="about-copy reveal" data-reveal>
+            <p class="about-kicker">About us</p>
+            <h2 id="about-heading" class="about-title">Fashion with purpose, comfort without compromise</h2>
+            <div class="about-rule" aria-hidden="true"></div>
+            <p class="about-lead">{{ about_lead }}</p>
+            <p class="about-text">{{ about_body }}</p>
+            <ul class="about-pillars" aria-label="What we stand for">
+                <li>Craft &amp; quality</li>
+                <li>Everyday elegance</li>
+                <li>Confident steps</li>
+            </ul>
+        </div>
+        <figure class="about-visual reveal" data-reveal>
+            <div class="about-visual-accent" aria-hidden="true"></div>
+            <div class="about-visual-frame">
+                <img src="{{ asset('build/images/Aboutt.jpg') }}" alt="RAIN footwear and brand atmosphere" width="640" height="800" loading="lazy">
+            </div>
+        </figure>
     </div>
-    <div class="about-image">
-        <img src="{{ asset('images/about.jpg') }}" alt="About RAIN">
+</section>
+
+{# ── MEET THE TEAM ─────────────────────────────────── #}
+<section class="team" id="team">
+    <h2 class="section-title">Meet the Team</h2>
+    <div class="section-rule"></div>
+    <div class="team-grid">
+        {% for member in team %}
+            <div class="team-card reveal" data-reveal>
+                <div class="team-avatar-wrap">
+                    <div class="team-avatar">
+                        <img src="{{ asset('build/images/' ~ member.image) }}" alt="" width="140" height="140" loading="lazy" decoding="async">
+                    </div>
+                </div>
+                <h3 class="team-name">{{ member.name }}</h3>
+                <p class="team-role">{{ member.role }}</p>
+                <p class="team-bio">{{ member.bio }}</p>
+            </div>
+        {% endfor %}
     </div>
 </section>
 
@@ -42,9 +81,9 @@
     <div class="section-rule"></div>
     <div class="collection-grid">
         {% for item in collections %}
-            <div class="coll-card fade-up">
+            <div class="coll-card reveal" data-reveal>
                 <div class="coll-card-img">
-                    <img src="{{ asset('images/' ~ item.image) }}" alt="{{ item.name }}">
+                    <img src="{{ asset('build/images/' ~ item.image) }}" alt="{{ item.name }}">
                 </div>
                 <div class="coll-card-body">
                     <h3>{{ item.name }}</h3>
@@ -54,7 +93,7 @@
         {% endfor %}
     </div>
     <div class="collection-cta">
-        <a href="#shop" class="btn btn-wine">More</a>
+        <a href="{{ path('landing_products') }}" class="btn btn-wine">View More</a>
     </div>
 </section>
 
@@ -64,9 +103,9 @@
     <div class="section-rule"></div>
     <div class="products-grid">
         {% for product in products %}
-            <div class="product-card fade-up">
+            <a href="{{ path('shop_product_show', { slug: product.slug }) }}" class="product-card product-card-link reveal" data-reveal>
                 <div class="product-card-img">
-                    <img src="{{ asset('images/' ~ product.image) }}" alt="{{ product.name }}">
+                    <img src="{{ asset('build/images/' ~ product.image) }}" alt="{{ product.name }}"{% if product.imageStyle is defined %} style="{{ product.imageStyle }}"{% endif %}>
                     {% if product.tag %}
                         <span class="product-tag">{{ product.tag }}</span>
                     {% endif %}
@@ -74,26 +113,52 @@
                 <h4>{{ product.name }}</h4>
                 <p>{{ product.description }}</p>
                 <span class="product-price">&#8369;{{ product.price|number_format(2) }}</span>
-            </div>
+            </a>
         {% endfor %}
     </div>
     <div class="products-cta">
-        <a href="#" class="btn btn-wine">See More</a>
+        <a href="{{ path('landing_products') }}" class="btn btn-wine">View More</a>
     </div>
 </section>
 
 {# ── SUBSCRIBE ────────────────────────────────────── #}
-<section class="subscribe">
-    <div class="subscribe-text">
+<section class="subscribe" id="subscribe">
+    <div class="subscribe-text reveal" data-reveal>
         <h2><em>Subscribe</em> <strong>for a special discount</strong></h2>
         <p>Join the RAIN family and get exclusive offers, early access to new collections, and style inspiration delivered to your inbox.</p>
     </div>
     <div>
-        <div class="subscribe-form">
-            <input type="text" placeholder="Name">
-            <input type="email" placeholder="Email">
-            <button class="btn btn-light">Sign Up</button>
-        </div>
+        <form
+            class="subscribe-form js-validate"
+            data-landing-form="subscribe"
+            data-submit-mode="server"
+            method="post"
+            action="{{ path('landing_subscribe_submit') }}"
+            novalidate
+        >
+            <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                autocomplete="name"
+                required
+                minlength="2"
+                data-field-label="Name"
+            >
+            <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                autocomplete="email"
+                required
+                data-field-label="Email"
+            >
+            <button class="btn btn-light" type="submit">Sign Up</button>
+
+            <div class="form-feedback" role="status" aria-live="polite"></div>
+            <div class="field-error" data-error-for="name"></div>
+            <div class="field-error" data-error-for="email"></div>
+        </form>
     </div>
 </section>
 
@@ -103,7 +168,7 @@
     <div class="section-rule"></div>
     <div class="testimonials-grid">
         {% for testimonial in testimonials %}
-            <div class="testi-card">
+            <div class="testi-card reveal" data-reveal>
                 <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 <blockquote>"{{ testimonial.quote }}"</blockquote>
                 <cite>&mdash; {{ testimonial.author }}</cite>
@@ -114,36 +179,80 @@
 
 {# ── FAQ ──────────────────────────────────────────── #}
 <section class="faq" id="faq">
-    <div class="faq-left">
+    <div class="faq-left reveal" data-reveal>
         <h2>FAQ Section</h2>
-        <div class="section-rule" style="margin:1rem 0 1.5rem;"></div>
+        <div class="section-rule faq-rule"></div>
         <p>Got questions? We've listed the answers to keep your shopping smooth and worry-free.</p>
         {% for faq in faqs %}
-            <div class="faq-item {% if loop.first %}open{% endif %}">
+            <div
+                class="faq-item {% if loop.first %}open{% endif %}"
+                role="button"
+                tabindex="0"
+                aria-expanded="{% if loop.first %}true{% else %}false{% endif %}"
+            >
                 <div class="faq-q">{{ faq.question }}</div>
                 <div class="faq-a">{{ faq.answer }}</div>
             </div>
         {% endfor %}
     </div>
     <div>
-        <div class="faq-form">
+        <form
+            class="faq-form js-validate reveal"
+            data-reveal
+            data-submit-mode="server"
+            data-landing-form="contact"
+            method="post"
+            action="{{ path('landing_contact_submit') }}"
+            novalidate
+        >
             <h3>We'd love to hear from you</h3>
             <div class="form-row">
                 <div class="form-group">
                     <label>Name</label>
-                    <input type="text" placeholder="Your name">
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Your name"
+                        autocomplete="name"
+                        required
+                        minlength="2"
+                        data-field-label="Name"
+                    >
+                    <div class="field-error" data-error-for="name"></div>
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" placeholder="your@email.com">
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="your@email.com"
+                        autocomplete="email"
+                        required
+                        data-field-label="Email"
+                    >
+                    <div class="field-error" data-error-for="email"></div>
                 </div>
             </div>
             <div class="form-group">
-                <label>Message</label>
-                <textarea rows="5" placeholder="Your message..."></textarea>
+                <label for="contact-message">Message</label>
+                <p class="form-hint" id="contact-message-hint">Type your question here. The heading above is not sent — this box must have your message (at least 3 characters).</p>
+                <textarea
+                    id="contact-message"
+                    rows="5"
+                    name="message"
+                    placeholder="Your message..."
+                    required
+                    minlength="3"
+                    maxlength="8000"
+                    aria-describedby="contact-message-hint"
+                    data-field-label="Message"
+                ></textarea>
+                <div class="field-error" data-error-for="message"></div>
             </div>
-            <button class="btn btn-wine" style="width:100%;text-align:center;">Submit</button>
-        </div>
+            <button class="btn btn-wine btn-full" type="submit">Submit</button>
+
+            <div class="form-feedback" role="status" aria-live="polite"></div>
+        </form>
     </div>
 </section>
 

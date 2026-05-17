@@ -49,6 +49,14 @@ class ProductType extends AbstractType
                     new Assert\PositiveOrZero(['message' => 'Price must be zero or positive.'])
                 ]
             ])
+            ->add('stock', IntegerType::class, [
+                'attr' => ['class' => 'form-control', 'min' => 0],
+                'label' => 'Stock',
+                'constraints' => [
+                    new Assert\NotNull(['message' => 'Stock is required.']),
+                    new Assert\PositiveOrZero(['message' => 'Stock must be zero or positive.']),
+                ]
+            ])
             ->add('category', TextType::class, [
                 'required' => false,
                 'attr' => ['class' => 'form-control'],

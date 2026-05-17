@@ -4,7 +4,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<div class="container-fluid">
+<div class="container-fluid admin-workspace py-3">
 
     <!-- Welcome Section -->
     <div class="mb-4">
@@ -60,7 +60,8 @@
                 <div class="card-body">
                     <p class="text-muted mb-1">Total Products</p>
                     <h3 class="fw-bold">{{ totalProducts }}</h3>
-                    <small class="text-success">{{ activeProducts }} active</small>
+                    <small class="text-success">{{ activeProducts }} active</small><br>
+                    <small class="text-muted">{{ totalProductStock }} total stock</small>
                 </div>
             </div>
         </div>
@@ -122,14 +123,14 @@
     {% endif %}
 
     <!-- Recent Orders + Quick Actions -->
-    <div class="row g-3">
+    <div class="row g-3 align-items-start">
         <!-- Recent Orders -->
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-xl-9">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white">
                     <h5 class="mb-0">Recent Orders</h5>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0 admin-table-scroll admin-table-scroll--inset">
                     {% if recentOrders|length > 0 %}
                     <table id="ordersTable" class="w-full">
                         <thead>
@@ -169,7 +170,7 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-xl-3">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white">
                     <h5 class="mb-0">Quick Actions</h5>
@@ -197,12 +198,34 @@
     }
 
     #ordersTable thead th {
-        border: 1px solid var(--admin-border) !important;
-        border-width: 0 0 1px 0 !important;
-        background-color: var(--admin-table-header) !important;
-        color: var(--admin-text-white) !important;
-        font-weight: 500;
-        padding: 0.75rem 1rem;
+        border: none !important;
+        background: linear-gradient(180deg, var(--rain-blush) 0%, var(--rain-warm-white) 55%, #f7f0ec 100%) !important;
+        color: var(--rain-wine-dark) !important;
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 1rem 1.25rem;
+        position: relative;
+        box-shadow: inset 0 -1px 0 rgba(122, 37, 53, 0.15);
+    }
+
+    #ordersTable thead th:first-child {
+        padding-left: 1.85rem;
+    }
+
+    #ordersTable thead th:not(:last-child) {
+        box-shadow: inset -1px 0 0 rgba(122, 37, 53, 0.12), inset 0 -1px 0 rgba(122, 37, 53, 0.15);
+    }
+
+    #ordersTable thead th.sorting:before,
+    #ordersTable thead th.sorting:after,
+    #ordersTable thead th.sorting_asc:before,
+    #ordersTable thead th.sorting_asc:after,
+    #ordersTable thead th.sorting_desc:before,
+    #ordersTable thead th.sorting_desc:after {
+        color: var(--rain-wine) !important;
+        opacity: 0.65;
     }
 
     #ordersTable tbody td {
@@ -300,7 +323,9 @@
                     "paging": true,
                     "info": true,
                     "autoWidth": false,
-                    "responsive": true,
+                    "responsive": false,
+                    "scrollX": true,
+                    "scrollCollapse": true,
                     "language": {
                         "search": "Search:",
                         "lengthMenu": "Show _MENU_ entries",

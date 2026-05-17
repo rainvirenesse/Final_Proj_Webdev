@@ -1,0 +1,102 @@
+{% extends 'admin/partials/layout.html.twig' %}
+
+{% block title %}Stock record #{{ record.id }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-3 admin-workspace">
+    <div class="row">
+        <div class="col-12 admin-detail-panel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0 fw-semibold">Stock record #{{ record.id }}</h5>
+                    {% set d = record.quantityDelta %}
+                    {% if d > 0 %}
+                        <span class="badge badge-admin-success fs-6">+{{ d }} in</span>
+                    {% else %}
+                        <span class="badge badge-admin-danger fs-6">{{ d }} out</span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4">
+                    <table class="table table-borderless mb-0 show-details-table">
+                        <tr>
+                            <th width="30%" class="text-muted fw-semibold">Product</th>
+                            <td class="fw-medium">
+                                <a href="{{ path('admin_product_show', { id: record.product.id }) }}">{{ record.product.name }}</a>
+                                <span class="text-muted">(#{{ record.product.id }})</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Price</th>
+                            <td class="fw-semibold text-success">₱{{ record.product.price|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Category</th>
+                            <td>{{ record.product.category ?? '—' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Product status</th>
+                            <td>
+                                <span class="badge {{ record.product.status == 'ACTIVE' ? 'badge-admin-success' : (record.product.status == 'OUT_OF_STOCK' ? 'badge-admin-danger' : 'badge-admin-warning') }} px-3 py-1">
+                                    {{ record.product.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Current on-hand</th>
+                            <td>{{ record.product.stock }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Quantity change</th>
+                            <td>{{ record.quantityDelta > 0 ? '+' ~ record.quantityDelta : record.quantityDelta }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Recorded at</th>
+                            <td>{{ record.createdAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Recorded by</th>
+                            <td>
+                                {% if record.createdBy %}
+                                    {% set u = record.createdBy %}
+                                    {% set roleLabel = 'ROLE_ADMIN' in u.roles ? 'Admin' : ('ROLE_STAFF' in u.roles ? 'Staff' : 'User') %}
+                                    <span class="fw-medium">{{ roleLabel }}</span>
+                                    <span class="text-muted">·</span>
+                                    {{ u.email }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if record.updatedAt or record.updatedBy %}
+                        <tr>
+                            <th class="text-muted fw-semibold">Last edited at</th>
+                            <td>{{ record.updatedAt ? record.updatedAt|date('Y-m-d H:i:s') : '—' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Last edited by</th>
+                            <td>
+                                {% if record.updatedBy %}
+                                    {% set u = record.updatedBy %}
+                                    {% set roleLabel = 'ROLE_ADMIN' in u.roles ? 'Admin' : ('ROLE_STAFF' in u.roles ? 'Staff' : 'User') %}
+                                    <span class="fw-medium">{{ roleLabel }}</span>
+                                    <span class="text-muted">·</span>
+                                    {{ u.email }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+                <div class="card-footer bg-white border-top">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ path('admin_stock_edit', { id: record.id }) }}" class="btn btn-dark">Edit</a>
+                        <a href="{{ path('admin_stock_index') }}" class="btn btn-outline-secondary">← Back to stock</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

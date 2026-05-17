@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Product;
+use App\Entity\StockRecord;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -133,10 +134,23 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
             $product->setPrice((string) $shoeData['price']);
             $product->setCategory($shoeData['category']);
             $product->setStatus($shoeData['status']);
+            // Seed inventory so dashboard/product tables can display stock.
+            // If you want fixed values, replace this with $shoeData['stock'].
+            $stockQty = (int) ($shoeData['stock'] ?? rand(5, 30));
+            $product->setStock($stockQty);
             $product->setCreatedBy($admin);
             // createdAt and updatedAt are set automatically via lifecycle callbacks
-            
+
             $manager->persist($product);
+
+            // Ledger row matching on-hand stock (does not re-apply delta; product.stock already set).
+            if ($stockQty !== 0) {
+                $opening = new StockRecord();
+                $opening->setProduct($product);
+                $opening->setQuantityDelta($stockQty);
+                $opening->setCreatedBy($admin);
+                $manager->persist($opening);
+            }
         }
 
         $manager->flush();

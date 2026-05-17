@@ -1,0 +1,14 @@
+{{ form_start(form) }}
+    <div class="row g-3">
+        <div class="col-md-12">
+            {{ form_row(form.product) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.quantityDelta) }}
+        </div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-dark">{{ submit_label|default('Save') }}</button>
+        <a href="{{ cancel_path }}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+{{ form_end(form) }}

@@ -3,13 +3,13 @@
 {% block title %}Products{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-3 admin-workspace">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4">Products</h1>
         <a href="{{ path('admin_product_new') }}" class="btn btn-dark">+ Add New Product</a>
     </div>
-        {% set headers = ['ID', 'Name', 'Price', 'Status', 'Category'] %}
+        {% set headers = ['ID', 'Name', 'Price', 'Stock', 'Status', 'Category'] %}
         {% set rows = [] %}
 
         {% for product in products %}
@@ -21,6 +21,7 @@
                 product.id,
                 product.name,
                 '₱' ~ product.price|number_format(2, '.', ','),
+                product.stock,
                 statusBadge,
                 product.category ?? 'N/A'
             ] %}

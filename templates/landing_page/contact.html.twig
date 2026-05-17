@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact — RAIN{% endblock %}
+{% block description %}Reach RAIN in Dumaguete or send us a message — online form or email.{% endblock %}
+
+{% block body %}
+<section class="products-page-hero">
+    <div class="products-page-hero-inner">
+        <p class="hero-eyebrow">Contact</p>
+        <h1 class="hero-title">We'd love to hear<br><strong>from you</strong></h1>
+        <p class="hero-sub">Got questions? Use the secure form below or write to us directly. We reply as soon as we can.</p>
+        <a href="{{ path('landing') }}" class="btn btn-outline">Back to Home</a>
+    </div>
+</section>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash flash-{{ label }} contact-flash" role="status" aria-live="polite">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<section class="contact-page" aria-labelledby="contact-heading">
+    <div class="contact-layout">
+        <div class="contact-aside reveal" data-reveal>
+            <h2 id="contact-heading" class="contact-aside-title">Visit &amp; reach us</h2>
+            <div class="section-rule faq-rule"></div>
+            <p class="contact-aside-lead">Same details you will find on our homepage — gathered here so you can save or share.</p>
+            <address class="contact-address">
+                <strong>RAIN</strong><br>
+                Unit 4, Downtown Commercial Hub<br>
+                Rizal Street, Dumaguete City<br>
+                Negros Oriental, Philippines
+            </address>
+            <ul class="contact-details">
+                <li><a href="tel:+639123456789">+63 912 345 6789</a></li>
+                <li><a href="mailto:raincredo91@gmail.com">raincredo91@gmail.com</a></li>
+            </ul>
+            <p class="contact-aside-note">For order updates, include your name and order reference if you have one.</p>
+        </div>
+
+        <div class="contact-main reveal" data-reveal>
+            {% if contactFormEmbedUrl %}
+                <div class="contact-embed-panel" data-contact-embed-panel>
+                    <h3 class="contact-panel-title">Send a message (online form)</h3>
+                    <p class="contact-embed-intro" id="embed-form-desc">Your answers are sent through our partner form (Google or Brevo). After you submit, a <strong>confirmation</strong> appears inside the grey area below.</p>
+                    <p class="contact-embed-status" data-embed-status role="status" aria-live="polite" aria-atomic="true"></p>
+                    <div class="contact-embed-frame">
+                        <iframe
+                            class="contact-embed-iframe"
+                            title="RAIN contact form"
+                            src="{{ contactFormEmbedUrl }}"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen="false"
+                            data-contact-embed-iframe
+                        ></iframe>
+                    </div>
+                    <ul class="contact-embed-tips" aria-label="How to know your message was sent">
+                        <li><strong>Google Forms:</strong> Look for “Your response has been recorded” (or similar) inside the frame above.</li>
+                        <li><strong>Brevo:</strong> A thank-you line or checkmark usually appears in the same area after Submit.</li>
+                    </ul>
+                    {% if contactFormOpenUrl %}
+                        <p class="contact-embed-alt"><a href="{{ contactFormOpenUrl }}" class="contact-open-new-tab" target="_blank" rel="noopener noreferrer">Open this form in a new tab</a> if the frame feels cramped on your phone.</p>
+                    {% endif %}
+                </div>
+                <p class="contact-divider-label"><span>Or message us by email</span></p>
+            {% else %}
+                {# <p class="contact-fallback-note" role="note">Prefer our built-in form? We will email both you and our team through the site. To use Google Forms or Brevo inline instead, set <code class="contact-code">CONTACT_FORM_EMBED_URL</code> in your environment to the embed <code class="contact-code">src</code> URL.</p> #}
+            {% endif %}
+
+            <div class="contact-native-panel" id="contact-native-form" data-native-form-wrap>
+                <h3 class="contact-panel-title">{% if contactFormEmbedUrl %}Email the team directly{% else %}We'd love to hear from you{% endif %}</h3>
+                <form
+                    class="faq-form contact-faq-form js-validate{% if contactFormEmbedUrl %} contact-faq-form-secondary{% endif %}"
+                    data-submit-mode="server"
+                    data-landing-form="contact-page"
+                    method="post"
+                    action="{{ path('contact_submit') }}"
+                    novalidate
+                >
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Your name"
+                                autocomplete="name"
+                                required
+                                minlength="2"
+                                data-field-label="Name"
+                            >
+                            <div class="field-error" data-error-for="name"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="your@email.com"
+                                autocomplete="email"
+                                required
+                                data-field-label="Email"
+                            >
+                            <div class="field-error" data-error-for="email"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-page-message">Message</label>
+                        <p class="form-hint" id="contact-page-message-hint">Tell us how we can help — sizing, orders, or partnerships (at least 3 characters).</p>
+                        <textarea
+                            id="contact-page-message"
+                            rows="5"
+                            name="message"
+                            placeholder="Your message..."
+                            required
+                            minlength="3"
+                            maxlength="8000"
+                            aria-describedby="contact-page-message-hint"
+                            data-field-label="Message"
+                        ></textarea>
+                        <div class="field-error" data-error-for="message"></div>
+                    </div>
+                    <button class="btn btn-wine btn-full" type="submit">Submit</button>
+                    <div class="form-feedback" role="status" aria-live="polite"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if contactFormEmbedUrl %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var iframe = document.querySelector('[data-contact-embed-iframe]');
+            var statusEl = document.querySelector('[data-embed-status]');
+            if (!iframe || !statusEl) return;
+
+            var setStatus = function (msg) {
+                statusEl.textContent = msg;
+            };
+
+            setStatus('Loading the form…');
+            iframe.addEventListener('load', function () {
+                setStatus('Form loaded. When you are finished, submit inside the frame above — a confirmation will appear there.');
+            });
+            iframe.addEventListener('error', function () {
+                setStatus('The form could not load. Try the “new tab” link below or use the email form.');
+            });
+        });
+    </script>
+    {% endif %}
+{% endblock %}

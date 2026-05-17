@@ -18,7 +18,7 @@ final class ServiceController extends AbstractController
     #[Route(name: 'admin_service_index', methods: ['GET'])]
     public function index(ServiceRepository $serviceRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         return $this->render('admin/service/index.html.twig', [
             'services' => $serviceRepository->findAll(),
@@ -28,7 +28,7 @@ final class ServiceController extends AbstractController
     #[Route('/new', name: 'admin_service_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         $service = new Service();
         // Ensure default values are set before form creation
@@ -91,7 +91,7 @@ final class ServiceController extends AbstractController
     #[Route('/{id}', name: 'admin_service_show', methods: ['GET'])]
     public function show(Service $service): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         return $this->render('admin/service/show.html.twig', [
             'service' => $service,
@@ -101,7 +101,7 @@ final class ServiceController extends AbstractController
     #[Route('/{id}/edit', name: 'admin_service_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Service $service, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         $form = $this->createForm(ServiceType::class, $service, ['is_new' => false]);
         $form->handleRequest($request);
@@ -154,7 +154,7 @@ final class ServiceController extends AbstractController
     #[Route('/{id}', name: 'admin_service_delete', methods: ['POST'])]
     public function delete(Request $request, Service $service, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         if ($this->isCsrfTokenValid('delete'.$service->getId(), $request->request->get('_token'))) {
             try {

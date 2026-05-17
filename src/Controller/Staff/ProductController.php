@@ -112,13 +112,7 @@ final class ProductController extends AbstractController
     public function edit(Request $request, Product $product): Response
     {
         $this->denyAccessUnlessGranted('ROLE_STAFF');
-        
-        // Staff can only edit products created by staff (not admins)
-        $createdBy = $product->getCreatedBy();
-        if ($createdBy === null || !in_array('ROLE_STAFF', $createdBy->getRoles())) {
-            throw $this->createAccessDeniedException('You can only edit products created by staff members.');
-        }
-        
+
         $form = $this->createForm(ProductType::class, $product, ['is_new' => false]);
         $form->handleRequest($request);
 
@@ -167,13 +161,7 @@ final class ProductController extends AbstractController
     public function delete(Request $request, Product $product): Response
     {
         $this->denyAccessUnlessGranted('ROLE_STAFF');
-        
-        // Staff can only delete products created by staff (not admins)
-        $createdBy = $product->getCreatedBy();
-        if ($createdBy === null || !in_array('ROLE_STAFF', $createdBy->getRoles())) {
-            throw $this->createAccessDeniedException('You can only delete products created by staff members.');
-        }
-        
+
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
             try {
                 // Check if product is used in any orders

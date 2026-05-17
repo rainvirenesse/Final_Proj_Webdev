@@ -23,6 +23,10 @@ class UserChecker implements UserCheckerInterface
         if ($user->isArchived()) {
             throw new CustomUserMessageAccountStatusException('Your account has been archived. Please contact an administrator.');
         }
+
+        if ($user->isVerified() !== true) {
+            throw new CustomUserMessageAccountStatusException('Please verify your email before logging in.');
+        }
     }
 
     public function checkPostAuth(UserInterface $user): void

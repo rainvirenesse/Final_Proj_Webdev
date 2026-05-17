@@ -1,0 +1,177 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }} — RAIN{% endblock %}
+{% block description %}{{ product.description }}{% endblock %}
+
+{% block body %}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash flash-{{ label }}" role="status" aria-live="polite">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<article class="shop-pdp">
+    <nav class="shop-pdp-breadcrumb">
+        <a href="{{ path('landing') }}">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{ path('landing_products') }}">Shop</a>
+        <span aria-hidden="true">/</span>
+        <span>{{ product.name }}</span>
+    </nav>
+
+    <div class="shop-pdp-grid">
+        <div class="shop-pdp-media reveal" data-reveal>
+            <div class="shop-pdp-img-wrap">
+                <img
+                    src="{{ asset('build/images/' ~ product.image) }}"
+                    alt="{{ product.name }}"
+                    {% if product.imageStyle is defined %}style="{{ product.imageStyle }}"{% endif %}
+                    width="720"
+                    height="900"
+                    loading="eager"
+                >
+                {% if product.tag %}
+                    <span class="product-tag shop-pdp-tag">{{ product.tag }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="shop-pdp-buy reveal" data-reveal>
+            <h1 class="shop-pdp-title">{{ product.name }}</h1>
+            <p class="shop-pdp-price">&#8369;{{ product.price|number_format(2) }}</p>
+            <p class="shop-pdp-desc">{{ product.description }}</p>
+
+            <section class="shop-pdp-panel" aria-labelledby="ship-fees-heading">
+                <h2 id="ship-fees-heading" class="shop-pdp-subhead">Shipping fees (Philippines)</h2>
+                <p class="shop-pdp-hint">Select your region below to include the correct fee in your total.</p>
+                <ul class="shop-pdp-ship-table">
+                    {% for key, zone in shippingZones %}
+                        <li><span>{{ zone.label }}</span><strong>&#8369;{{ zone.fee|number_format(0) }}</strong></li>
+                    {% endfor %}
+                </ul>
+                <p class="shop-pdp-note">Metro Manila orders typically ship in 2–3 business days; provincial 5–7. Final courier fee may be confirmed after checkout.</p>
+            </section>
+
+            <form class="shop-checkout-form" method="post" action="{{ path('shop_checkout') }}" id="shop-checkout-form">
+                <input type="hidden" name="product_slug" value="{{ product.slug }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('shop_checkout') }}">
+
+                <div class="shop-field">
+                    <label for="size">Size (EU / PH)</label>
+                    <select name="size" id="size" class="shop-select" required>
+                        <option value="">Choose size</option>
+                        {% for s in product.sizes %}
+                            <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="shop-field">
+                    <label for="color">Color</label>
+                    <select name="color" id="color" class="shop-select" required>
+                        <option value="">Choose color</option>
+                        {% for c in product.colors %}
+                            <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="shop-field">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" name="quantity" id="quantity" class="shop-input" min="1" max="10" value="1" required>
+                </div>
+
+                <div class="shop-field">
+                    <label for="shipping_zone">Shipping region</label>
+                    <select name="shipping_zone" id="shipping_zone" class="shop-select" required>
+                        <option value="">Select region</option>
+                        {% for key, zone in shippingZones %}
+                            <option value="{{ key }}" data-fee="{{ zone.fee }}">{{ zone.label }} — &#8369;{{ zone.fee|number_format(0) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="shop-summary" id="shop-order-summary" aria-live="polite">
+                    <div class="shop-summary-row">
+                        <span>Subtotal</span>
+                        <strong id="summary-subtotal">&#8369;{{ product.price|number_format(2) }}</strong>
+                    </div>
+                    <div class="shop-summary-row">
+                        <span>Shipping</span>
+                        <strong id="summary-shipping">—</strong>
+                    </div>
+                    <div class="shop-summary-row shop-summary-total">
+                        <span>Estimated total</span>
+                        <strong id="summary-total">—</strong>
+                    </div>
+                </div>
+
+                <fieldset class="shop-fieldset">
+                    <legend class="shop-legend">Contact &amp; delivery</legend>
+                    <div class="shop-field">
+                        <label for="buyer_name">Full name</label>
+                        <input type="text" name="buyer_name" id="buyer_name" class="shop-input" required autocomplete="name" minlength="2">
+                    </div>
+                    <div class="shop-field">
+                        <label for="buyer_email">Email</label>
+                        <input type="email" name="buyer_email" id="buyer_email" class="shop-input" required autocomplete="email">
+                    </div>
+                    <div class="shop-field">
+                        <label for="buyer_phone">Mobile number</label>
+                        <input type="tel" name="buyer_phone" id="buyer_phone" class="shop-input" required autocomplete="tel" placeholder="+63 9XX XXX XXXX">
+                    </div>
+                    <div class="shop-field">
+                        <label for="shipping_address">Full shipping address</label>
+                        <textarea name="shipping_address" id="shipping_address" class="shop-textarea" rows="3" required minlength="10" placeholder="Street, barangay, city, province, ZIP"></textarea>
+                    </div>
+                    <div class="shop-field">
+                        <label for="order_notes">Order notes <span class="shop-optional">(optional)</span></label>
+                        <textarea name="order_notes" id="order_notes" class="shop-textarea" rows="2" maxlength="2000" placeholder="Leave-in gate, gift message, etc."></textarea>
+                    </div>
+                </fieldset>
+
+                <p class="shop-pdp-pay-note">After you place your order, our team will reply with payment options (bank transfer, e-wallet, or COD where available) — similar to marketplace checkout.</p>
+                <button type="submit" class="btn btn-wine shop-checkout-btn">Place order</button>
+            </form>
+
+            <p class="shop-pdp-back"><a href="{{ path('landing_products') }}" class="link-back-shop">&larr; Back to all products</a></p>
+        </div>
+    </div>
+</article>
+
+<script>
+(function () {
+    var unit = {{ product.price|json_encode|raw }};
+    var qEl = document.getElementById('quantity');
+    var zEl = document.getElementById('shipping_zone');
+    var subEl = document.getElementById('summary-subtotal');
+    var shipEl = document.getElementById('summary-shipping');
+    var totEl = document.getElementById('summary-total');
+
+    function money(n) {
+        return '₱' + Number(n).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function update() {
+        var q = Math.max(1, Math.min(10, parseInt(qEl.value, 10) || 1));
+        qEl.value = q;
+        var sub = unit * q;
+        subEl.textContent = money(sub);
+        var opt = zEl.options[zEl.selectedIndex];
+        var fee = opt && opt.dataset.fee !== undefined ? parseFloat(opt.dataset.fee, 10) : NaN;
+        if (!zEl.value || isNaN(fee)) {
+            shipEl.textContent = '—';
+            totEl.textContent = '—';
+            return;
+        }
+        shipEl.textContent = money(fee);
+        totEl.textContent = money(sub + fee);
+    }
+
+    qEl.addEventListener('input', update);
+    qEl.addEventListener('change', update);
+    zEl.addEventListener('change', update);
+    update();
+})();
+</script>
+{% endblock %}

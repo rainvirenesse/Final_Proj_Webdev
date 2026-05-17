@@ -3,9 +3,9 @@
 {% block title %}Product Details{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-3 admin-workspace">
     <div class="row">
-        <div class="col-12 col-md-8 col-lg-6 mx-auto">
+        <div class="col-12 admin-detail-panel">
             <div class="card shadow-sm">
                 <div class="card-header bg-white border-bottom">
                     <h5 class="mb-0 fw-semibold">Product Details</h5>
@@ -27,6 +27,10 @@
                         <tr>
                             <th class="text-muted fw-semibold">Price:</th>
                             <td class="fw-semibold text-success">₱{{ product.price|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-semibold">Stock:</th>
+                            <td>{{ product.stock }}</td>
                         </tr>
                         <tr>
                             <th class="text-muted fw-semibold">Status:</th>

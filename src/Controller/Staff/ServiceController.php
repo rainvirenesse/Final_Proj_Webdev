@@ -108,13 +108,7 @@ final class ServiceController extends AbstractController
     public function edit(Request $request, Service $service, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_STAFF');
-        
-        // Staff can only edit services created by staff (not admins)
-        $createdBy = $service->getCreatedBy();
-        if ($createdBy === null || !in_array('ROLE_STAFF', $createdBy->getRoles())) {
-            throw $this->createAccessDeniedException('You can only edit services created by staff members.');
-        }
-        
+
         $form = $this->createForm(ServiceType::class, $service, ['is_new' => false]);
         $form->handleRequest($request);
 
@@ -167,13 +161,7 @@ final class ServiceController extends AbstractController
     public function delete(Request $request, Service $service, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_STAFF');
-        
-        // Staff can only delete services created by staff (not admins)
-        $createdBy = $service->getCreatedBy();
-        if ($createdBy === null || !in_array('ROLE_STAFF', $createdBy->getRoles())) {
-            throw $this->createAccessDeniedException('You can only delete services created by staff members.');
-        }
-        
+
         if ($this->isCsrfTokenValid('delete'.$service->getId(), $request->request->get('_token'))) {
             try {
                 // Check if service is used in any orders

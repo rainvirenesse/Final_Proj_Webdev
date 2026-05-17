@@ -36,6 +36,10 @@ class APILoginController extends AbstractController
             return new JsonResponse(['error' => 'Invalid credentials'], 401);
         }
 
+        if ($user->isVerified() !== true) {
+            return new JsonResponse(['error' => 'Please verify your email before logging in.'], 403);
+        }
+
         $token = $jwtManager->create($user);
 
         return new JsonResponse([

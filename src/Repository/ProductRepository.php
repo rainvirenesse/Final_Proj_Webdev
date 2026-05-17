@@ -52,5 +52,15 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function sumStock(): int
+    {
+        $sum = $this->createQueryBuilder('p')
+            ->select('COALESCE(SUM(p.stock), 0)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int) $sum;
+    }
 }
 

@@ -5,7 +5,9 @@ namespace App\Entity;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\ApiResource;
 
+#[ApiResource]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class Product
@@ -62,6 +64,10 @@ class Product
         maxMessage: "Category cannot exceed {{ limit }} characters."
     )]
     private ?string $category = null;
+
+    #[ORM\Column(type: 'integer')]
+    #[Assert\PositiveOrZero(message: "Stock must be zero or positive.")]
+    private int $stock = 0;
 
     #[ORM\Column(type: 'datetime_immutable')]
     // No validation needed - set automatically by PrePersist lifecycle callback
@@ -153,6 +159,17 @@ class Product
     public function setCategory(?string $category): self
     {
         $this->category = $category;
+        return $this;
+    }
+
+    public function getStock(): int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(int $stock): self
+    {
+        $this->stock = max(0, $stock);
         return $this;
     }
 

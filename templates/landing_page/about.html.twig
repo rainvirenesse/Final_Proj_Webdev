@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}About — RAIN{% endblock %}
+{% block description %}Fashion with purpose, comfort without compromise. Learn our story and meet the RAIN team.{% endblock %}
+
+{% block body %}
+<section class="products-page-hero">
+    <div class="products-page-hero-inner">
+        <p class="hero-eyebrow">About RAIN</p>
+        <h1 class="hero-title">Fashion with purpose,<br><strong>comfort without compromise</strong></h1>
+        <p class="hero-sub">Step into confidence. Every pair crafted to blend elegance with everyday comfort — now with a deeper look at how we work.</p>
+        <a href="{{ path('landing') }}" class="btn btn-outline">Back to Home</a>
+    </div>
+</section>
+
+<section class="about about-page" aria-labelledby="about-page-heading">
+    <div class="about-wrap">
+        <div class="about-copy reveal" data-reveal>
+            <p class="about-kicker">About us</p>
+            <h2 id="about-page-heading" class="about-title">The same heart as our homepage — with room for the full story</h2>
+            <div class="about-rule" aria-hidden="true"></div>
+            <p class="about-lead">{{ about_lead }}</p>
+            <p class="about-text">{{ about_body }}</p>
+            <ul class="about-pillars" aria-label="What we stand for">
+                <li>Craft &amp; quality</li>
+                <li>Everyday elegance</li>
+                <li>Confident steps</li>
+            </ul>
+            <div class="about-page-detail">
+                {% for para in about_extra_paragraphs %}
+                    <p class="about-text">{{ para }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <figure class="about-visual reveal" data-reveal>
+            <div class="about-visual-accent" aria-hidden="true"></div>
+            <div class="about-visual-frame">
+                <img src="{{ asset('build/images/Aboutt.jpg') }}" alt="RAIN footwear and brand atmosphere" width="640" height="800" loading="lazy">
+            </div>
+        </figure>
+    </div>
+</section>
+
+<section class="team team-about-page" id="team">
+    <h2 class="section-title">Meet the Team</h2>
+    <div class="section-rule"></div>
+    <p class="team-page-intro reveal" data-reveal>The people behind every launch, fitting note, and parcel that leaves Dumaguete.</p>
+    <div class="team-grid">
+        {% for member in team %}
+            <div class="team-card reveal" data-reveal>
+                <div class="team-avatar-wrap">
+                    <div class="team-avatar">
+                        <img src="{{ asset('build/images/' ~ member.image) }}" alt="" width="140" height="140" loading="lazy" decoding="async">
+                    </div>
+                </div>
+                <h3 class="team-name">{{ member.name }}</h3>
+                <p class="team-role">{{ member.role }}</p>
+                <p class="team-bio">{{ member.bio }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

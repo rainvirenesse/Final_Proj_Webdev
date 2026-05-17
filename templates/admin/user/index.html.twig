@@ -3,26 +3,25 @@
 {% block title %}Users{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-3 admin-workspace">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4">Users</h1>
         <a href="{{ path('admin_user_new') }}" class="btn btn-dark">+ Add New User</a>
     </div>
-        {% set headers = ['ID', 'Username', 'Email', 'Roles', 'Status', 'Created'] %}
+        {% set headers = ['ID', 'Username', 'Email', 'Roles', 'Account', 'Created'] %}
         {% set rows = [] %}
 
         {% for user in users %}
-            {% set statusBadge = '<span class="badge ' ~ 
-                (user.status == 'ACTIVE' ? 'badge-admin-success' : 
-                 (user.status == 'DISABLED' ? 'badge-admin-danger' : 'badge-admin-warning')) ~ 
-                '">' ~ user.status ~ '</span>' %}
+            {% set accountBadge = user.isLoginPresenceActive ?
+                '<span class="badge badge-admin-success">Active</span>' :
+                '<span class="badge bg-secondary">Inactive</span>' %}
             {% set row = [
                 user.id,
                 user.username ?? 'N/A',
                 user.email,
                 user.roles|join(', '),
-                statusBadge,
+                accountBadge,
                 user.createdAt|date('Y-m-d')
             ] %}
             {% set rows = rows|merge([row]) %}

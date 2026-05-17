@@ -32,15 +32,23 @@
     </h6>
     
     <div class="row g-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 {{ form_label(form.price, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                 {{ form_widget(form.price, {'attr': {'class': 'form-control form-control-lg'}}) }}
                 {{ form_errors(form.price) }}
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form_label(form.stock, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.stock, {'attr': {'class': 'form-control form-control-lg', 'min': 0}}) }}
+                {{ form_errors(form.stock) }}
+            </div>
+        </div>
         
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 {{ form_label(form.category, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                 {{ form_widget(form.category, {'attr': {'class': 'form-control form-control-lg'}}) }}

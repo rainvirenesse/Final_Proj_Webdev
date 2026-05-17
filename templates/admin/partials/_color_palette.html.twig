@@ -6,10 +6,17 @@
     
     /* Primary Colors */
     :root {
+        /* RAIN storefront palette (shared accent) */
+        --rain-wine: #7a2535;
+        --rain-wine-dark: #5c1a27;
+        --rain-blush: #f3e8e2;
+        --rain-blush-mid: #e8d5cc;
+        --rain-warm-white: #faf6f3;
+        --rain-taupe: #b59a8e;
         --admin-dark: #212529;        /* Sidebar background */
         --admin-dark-hover: #343a40;   /* Sidebar hover/active */
-        --admin-table-header: #1f2937; /* Table header background */
-        --admin-table-header-hover: #374151; /* Table header hover */
+        --admin-table-header: #2d1820; /* Wine-tinted table header */
+        --admin-table-header-hover: #43202a; /* Table header hover */
         
         /* Neutral Colors */
         --admin-white: #ffffff;
@@ -80,6 +87,96 @@
     .badge-admin-info {
         background-color: var(--admin-info);
         color: var(--admin-text-white);
+    }
+
+    /* Primary actions — brand wine instead of flat black */
+    #content .btn-dark {
+        background: linear-gradient(135deg, var(--rain-wine) 0%, var(--rain-wine-dark) 100%);
+        border-color: var(--rain-wine-dark);
+        color: var(--admin-text-white);
+    }
+    #content .btn-dark:hover,
+    #content .btn-dark:focus {
+        background: var(--rain-wine-dark);
+        border-color: var(--rain-wine-dark);
+        color: var(--admin-text-white);
+    }
+
+    /* Cards: soft wine edge + warmer shadow */
+    #content .card {
+        border-color: rgba(122, 37, 53, 0.14) !important;
+        box-shadow: 0 4px 18px rgba(44, 32, 32, 0.07) !important;
+    }
+    #content .card.border-0 {
+        border-top: 3px solid var(--rain-wine) !important;
+    }
+
+    /* Nudge datatable block right so headers aren’t flush to card edge */
+    .admin-table-scroll--inset {
+        padding-left: 0.75rem;
+        padding-right: 0.5rem;
+        box-sizing: border-box;
+    }
+
+    /*
+     * DataTables + scrollX: the *visible* header is a cloned table inside
+     * .dataTables_scrollHead — it does not keep the original id, so per-table
+     * #myTable thead th rules never apply. Give the strip a real container + tint.
+     */
+    #content .admin-table-scroll div.dataTables_scroll {
+        padding-top: 0.45rem;
+    }
+
+    #content .admin-table-scroll div.dataTables_scrollHead {
+        background: linear-gradient(180deg, var(--rain-blush-mid) 0%, var(--rain-blush) 38%, var(--rain-warm-white) 100%);
+        border: 1px solid rgba(122, 37, 53, 0.24);
+        border-bottom: 1px solid rgba(122, 37, 53, 0.14);
+        border-radius: 0.5rem 0.5rem 0 0;
+        box-sizing: border-box;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    }
+
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > th,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > td {
+        background: transparent !important;
+        color: var(--rain-wine-dark) !important;
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 1rem 1.25rem !important;
+        border: none !important;
+        vertical-align: middle;
+    }
+
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > th:first-child,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > td:first-child {
+        padding-left: 1.85rem !important;
+    }
+
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > th:not(:last-child),
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > td:not(:last-child) {
+        box-shadow: inset -1px 0 0 rgba(122, 37, 53, 0.12), inset 0 -1px 0 rgba(122, 37, 53, 0.12) !important;
+    }
+
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > th:last-child,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable > thead > tr > td:last-child {
+        box-shadow: inset 0 -1px 0 rgba(122, 37, 53, 0.12) !important;
+    }
+
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable thead th.sorting:before,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable thead th.sorting:after,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable thead th.sorting_asc:before,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable thead th.sorting_asc:after,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable thead th.sorting_desc:before,
+    #content .admin-table-scroll div.dataTables_scrollHead table.dataTable thead th.sorting_desc:after {
+        color: var(--rain-wine) !important;
+        opacity: 0.55;
     }
 </style>
 

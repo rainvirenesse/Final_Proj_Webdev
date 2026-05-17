@@ -22,7 +22,7 @@ final class ProductController extends AbstractController
     #[Route(name: 'admin_product_index', methods: ['GET'])]
     public function index(ProductRepository $productRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         return $this->render('admin/product/index.html.twig', [
             'products' => $productRepository->findAll(),
@@ -32,7 +32,7 @@ final class ProductController extends AbstractController
     #[Route('/new', name: 'admin_product_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         $product = new Product();
         // Set default status to ACTIVE for new products
@@ -100,7 +100,7 @@ final class ProductController extends AbstractController
     #[Route('/{id}', name: 'admin_product_show', methods: ['GET'])]
     public function show(Product $product): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         return $this->render('admin/product/show.html.twig', [
             'product' => $product,
@@ -110,7 +110,7 @@ final class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'admin_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         $form = $this->createForm(ProductType::class, $product, ['is_new' => false]);
         $form->handleRequest($request);
@@ -159,7 +159,7 @@ final class ProductController extends AbstractController
     #[Route('/{id}', name: 'admin_product_delete', methods: ['POST'])]
     public function delete(Request $request, Product $product): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
         
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
             try {

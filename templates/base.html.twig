@@ -43,6 +43,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         <link rel="stylesheet" href="{{ asset('styles/rain.css') }}">
@@ -54,20 +55,44 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
+    <body{% block body_class %}{% endblock %}>
 
         {% block navbar %}
-        <nav>
-            <a href="{{ path('landing') }}" class="nav-logo">
-                RAIN<span>Fashion At Your Feet</span>
-            </a>
-            <ul>
-                <li><a href="{{ path('landing') }}">Home</a></li>
-                <li><a href="{{ path('landing') }}#about">About</a></li>
-                <li><a href="{{ path('landing') }}#shop">Shop</a></li>
-                <li><a href="{{ path('landing') }}#testimonials">Testimonials</a></li>
-                <li><a href="{{ path('landing') }}#faq">FAQ</a></li>
-            </ul>
+        <nav class="site-nav" role="navigation" aria-label="Primary">
+            <div class="nav-inner">
+                {# Logo in a hanging tab (layout reference) #}
+              <a href="{{ path('landing') }}" class="nav-logo-tab" aria-label="RAIN Home">
+              <img src="{{ asset('images/logo.png') }}" alt="RAIN Logo" style="width: 80px; height: auto;">
+</a>
+
+                <div class="nav-center-wrap">
+                    <button
+                        class="nav-toggle"
+                        type="button"
+                        aria-label="Toggle navigation"
+                        aria-controls="primary-nav"
+                        aria-expanded="false"
+                    >
+                        <span class="nav-toggle-lines" aria-hidden="true"></span>
+                    </button>
+
+                    <ul id="primary-nav" class="nav-links">
+                        <li><a href="{{ path('landing') }}">Home</a></li>
+                        <li><a href="{{ path('about') }}">About</a></li>
+                        <li><a href="{{ path('landing') }}#shop">Shop</a></li>
+                        <li><a href="{{ path('landing') }}#testimonials">Testimonials</a></li>
+                        <li><a href="{{ path('landing') }}#faq">FAQ</a></li>
+                        <li><a href="{{ path('contact') }}">Contact</a></li>
+                        <li class="nav-mobile-only"><a href="{{ path('login') }}">Sign in</a></li>
+                        <li class="nav-mobile-only"><a href="{{ path('app_register') }}">Sign up</a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-actions">
+                    <a class="nav-actions__btn nav-actions__btn--ghost" href="{{ path('login') }}">Sign in</a>
+                    <a class="nav-actions__btn nav-actions__btn--primary" href="{{ path('app_register') }}">Sign up</a>
+                </div>
+            </div>
         </nav>
         {% endblock %}
 
@@ -85,10 +110,11 @@
                     <h4>Navigate</h4>
                     <ul>
                         <li><a href="{{ path('landing') }}">Home</a></li>
-                        <li><a href="{{ path('landing') }}#about">About</a></li>
+                        <li><a href="{{ path('about') }}">About</a></li>
                         <li><a href="{{ path('landing') }}#shop">Shop</a></li>
                         <li><a href="{{ path('landing') }}#testimonials">Testimonials</a></li>
                         <li><a href="{{ path('landing') }}#faq">FAQ</a></li>
+                        <li><a href="{{ path('contact') }}">Contact</a></li>
                     </ul>
                 </div>
                 <div>
@@ -107,7 +133,8 @@
                        Negros Oriental</p>
                     <p style="margin-top:.8rem;">
                         +63 912 345 6789<br>
-                        hello@rain.ph
+                        {# hello@rain.ph #}
+                        raincredo91@gmail.com
                     </p>
                 </div>
             </div>
@@ -121,6 +148,41 @@
             </div>
         </footer>
         {% endblock %}
+
+        <script>
+            (function () {
+                var navToggle = document.querySelector('.nav-toggle');
+                var primaryNav = document.getElementById('primary-nav');
+                if (!navToggle || !primaryNav) return;
+
+                var setOpen = function (open) {
+                    document.body.classList.toggle('nav-open', open);
+                    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                };
+
+                navToggle.setAttribute('aria-expanded', 'false');
+                navToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var isOpen = document.body.classList.contains('nav-open');
+                    setOpen(!isOpen);
+                });
+
+                primaryNav.querySelectorAll('a').forEach(function (a) {
+                    a.addEventListener('click', function () { setOpen(false); });
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!document.body.classList.contains('nav-open')) return;
+                    if (primaryNav.contains(e.target) || navToggle.contains(e.target)) return;
+                    setOpen(false);
+                });
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') setOpen(false);
+                });
+            })();
+        </script>
 
     </body>
 </html>

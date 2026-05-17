@@ -75,6 +75,7 @@ final class UserController extends AbstractController
                     
                     $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
                     $user->setPassword($hashedPassword);
+                    $user->setIsVerified(true);
                     
                     // Ensure roles are set
                     if (empty($user->getRoles())) {

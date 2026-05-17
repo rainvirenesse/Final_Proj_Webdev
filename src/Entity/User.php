@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\ApiResource;
+
+#[ApiResource]
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -53,6 +56,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /** Last activity in admin/staff area; cleared on logout. Drives Account Active/Inactive in user listings. */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $lastActivityAt = null;
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Assert\NotBlank(message: "Username cannot be blank.")]
@@ -137,6 +144,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    public function getLastActivityAt(): ?\DateTimeImmutable
+    {
+        return $this->lastActivityAt;
+    }
+
+    public function setLastActivityAt(?\DateTimeImmutable $lastActivityAt): self
+    {
+        $this->lastActivityAt = $lastActivityAt;
+
+        return $this;
+    }
+
+    /**
+     * True if the user has a recent admin/staff session (within $ttlSeconds).
+     */
+    public function isLoginPresenceActive(int $ttlSeconds = 300): bool
+    {
+        if ($this->lastActivityAt === null) {
+            return false;
+        }
+
+        $threshold = new \DateTimeImmutable(sprintf('-%d seconds', $ttlSeconds));
+
+        return $this->lastActivityAt >= $threshold;
     }
 
     public function getStatus(): ?string
@@ -298,4 +331,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    #[ORM\Column(length: 255, nullable: true)]
+private ?string $googleId = null;
+
+public function getGoogleId(): ?string
+{
+    return $this->googleId;
+}
+
+public function setGoogleId(?string $googleId): static
+{
+    $this->googleId = $googleId;
+    return $this;
+}
 }

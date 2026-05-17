@@ -3,9 +3,11 @@
 namespace App\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
@@ -28,7 +30,8 @@ class ExceptionListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::EXCEPTION => ['onKernelException', 10],
+            // Run after Security / HttpKernel handlers so we can replace login redirects with JSON for /api.
+            KernelEvents::EXCEPTION => ['onKernelException', -250],
         ];
     }
 
@@ -40,6 +43,14 @@ class ExceptionListener implements EventSubscriberInterface
 
         // Handle Access Denied Exceptions
         if ($exception instanceof AccessDeniedException) {
+            if ($this->isApiRequest($request)) {
+                $user = $request->getUser();
+                $status = $user ? Response::HTTP_FORBIDDEN : Response::HTTP_UNAUTHORIZED;
+                $body = ['error' => $user ? 'Access denied' : 'Authentication required'];
+                $event->setResponse(new JsonResponse($body, $status));
+                return;
+            }
+
             $message = $exception->getMessage() ?: 'Access denied. You do not have permission to access this resource.';
             
             // Check if user is authenticated
@@ -66,7 +77,7 @@ class ExceptionListener implements EventSubscriberInterface
                     if (in_array('ROLE_ADMIN', $roles)) {
                         $response = new RedirectResponse($this->router->generate('admin_dashboard'));
                     } elseif (in_array('ROLE_STAFF', $roles)) {
-                        $response = new RedirectResponse($this->router->generate('staff_product_index'));
+                        $response = new RedirectResponse($this->router->generate('admin_dashboard'));
                     } else {
                         $response = new RedirectResponse($this->router->generate('profile_show'));
                     }
@@ -79,6 +90,14 @@ class ExceptionListener implements EventSubscriberInterface
 
         // Handle Authentication Exceptions
         if ($exception instanceof AuthenticationException) {
+            if ($this->isApiRequest($request)) {
+                $event->setResponse(new JsonResponse(
+                    ['error' => 'Authentication required'],
+                    Response::HTTP_UNAUTHORIZED
+                ));
+                return;
+            }
+
             if ($session) {
                 $session->getFlashBag()->add('warning', 'Authentication required. Please log in.');
             }
@@ -129,6 +148,17 @@ class ExceptionListener implements EventSubscriberInterface
                 return;
             }
         }
+    }
+
+    private function isApiRequest(Request $request): bool
+    {
+        if (str_starts_with($request->getPathInfo(), '/api')) {
+            return true;
+        }
+
+        $accept = (string) $request->headers->get('Accept', '');
+
+        return str_contains($accept, 'application/json');
     }
 }
 
