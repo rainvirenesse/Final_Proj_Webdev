@@ -5,6 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     user_images_directory: '%kernel.project_dir%/public/uploads/users'
+    product_images_directory: '%kernel.project_dir%/public/images/products'
+    env(APP_URL): 'http://127.0.0.1:8000'
+    app.url: '%env(APP_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -16,6 +19,15 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    App\Service\ProductImageStorage:
+        arguments:
+            $productImagesDirectory: '%product_images_directory%'
+            $projectDir: '%kernel.project_dir%'
+
+    App\Serializer\ProductNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 64 }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

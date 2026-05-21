@@ -44,11 +44,12 @@
                             <th class="text-muted fw-semibold">Category:</th>
                             <td>{{ product.category ?? 'N/A' }}</td>
                         </tr>
-                        {% if product.image %}
+                        {% set productImg = product_image_url(product.image) %}
+                        {% if productImg %}
                         <tr>
                             <th class="text-muted fw-semibold">Image:</th>
                             <td>
-                                <img src="{{ asset(product.image) }}" class="rounded shadow-sm" style="max-width: 200px; max-height: 200px; object-fit: cover; border: 2px solid var(--admin-border);">
+                                <img src="{{ productImg }}" alt="{{ product.name }}" class="rounded shadow-sm" style="max-width: 200px; max-height: 200px; object-fit: cover; border: 2px solid var(--admin-border);">
                             </td>
                         </tr>
                         {% endif %}

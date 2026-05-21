@@ -11,7 +11,7 @@
                     <h5 class="mb-0 fw-semibold">Create New Product</h5>
                 </div>
                 <div class="card-body p-4">
-                    {{ include('admin/product/_form.html.twig') }}
+                    {{ include('admin/product/_form.html.twig', { product: product }) }}
                 </div>
             </div>
             <div class="mt-3">

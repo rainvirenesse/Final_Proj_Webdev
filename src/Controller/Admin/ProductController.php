@@ -5,9 +5,12 @@ namespace App\Controller\Admin;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use App\Service\ProductImageFormHandler;
+use App\Service\ProductImageStorage;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,7 +19,9 @@ use Symfony\Component\Routing\Annotation\Route;
 final class ProductController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private ProductImageFormHandler $productImageFormHandler,
+        private ProductImageStorage $productImageStorage,
     ) {
     }
     #[Route(name: 'admin_product_index', methods: ['GET'])]
@@ -62,12 +67,16 @@ final class ProductController extends AbstractController
                     if (!$product->getCreatedBy()) {
                         $product->setCreatedBy($this->getUser());
                     }
+
+                    $this->productImageFormHandler->handle($form, $product);
                     
                     $this->entityManager->persist($product);
                     $this->entityManager->flush();
 
                     $this->addFlash('success', 'Product created successfully!');
                     return $this->redirectToRoute('admin_product_index', [], Response::HTTP_SEE_OTHER);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', $e->getMessage());
                 } catch (UniqueConstraintViolationException $e) {
                     if (str_contains($e->getMessage(), 'sku')) {
                         $this->addFlash('danger', 'A product with this SKU already exists. Please use a different SKU.');
@@ -126,11 +135,15 @@ final class ProductController extends AbstractController
                     if ($product->getPrice() === null || (float)$product->getPrice() < 0) {
                         throw new \InvalidArgumentException('Product price must be zero or positive.');
                     }
+
+                    $this->productImageFormHandler->handle($form, $product);
                     
                     $this->entityManager->flush();
 
                     $this->addFlash('success', 'Product updated successfully!');
                     return $this->redirectToRoute('admin_product_index', [], Response::HTTP_SEE_OTHER);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', $e->getMessage());
                 } catch (UniqueConstraintViolationException $e) {
                     $this->addFlash('danger', 'A product with this identifier already exists.');
                 } catch (\InvalidArgumentException $e) {
@@ -171,6 +184,8 @@ final class ProductController extends AbstractController
                     $this->addFlash('danger', 'Cannot delete product. It is associated with existing orders.');
                     return $this->redirectToRoute('admin_product_index', [], Response::HTTP_SEE_OTHER);
                 }
+
+                $this->productImageStorage->removeIfManaged($product->getImage());
                 
                 $this->entityManager->remove($product);
                 $this->entityManager->flush();

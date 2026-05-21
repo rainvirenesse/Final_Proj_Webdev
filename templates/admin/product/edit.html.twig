@@ -11,7 +11,7 @@
                     <h5 class="mb-0 fw-semibold">Edit Product: {{ product.name }}</h5>
                 </div>
                 <div class="card-body p-4">
-                    {{ include('admin/product/_form.html.twig', {'button_label': 'Update', 'show_button': false}) }}
+                    {{ include('admin/product/_form.html.twig', { product: product, button_label: 'Update', show_button: false }) }}
                 </div>
                 <div class="card-footer bg-white border-top">
                     <div class="d-flex gap-2 justify-content-end">

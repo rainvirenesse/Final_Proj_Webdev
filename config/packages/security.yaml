@@ -48,6 +48,11 @@ security:
             stateless: true
             security: false
 
+        api_customer_catalog:
+            pattern: ^/api/customer/products
+            stateless: true
+            security: false
+
         api_entrypoint_public:
             # Disabled: keep /api protected.
             pattern: ^$
@@ -113,6 +118,8 @@ security:
         - { path: ^/api/auth/google/mobile, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify-email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/customer/products, roles: PUBLIC_ACCESS }
+        - { path: ^/api/customer, roles: ROLE_USER }
         - { path: ^/api, roles: IS_AUTHENTICATED }
         # - { path: ^/user, roles: IS_AUTHENTICATED }
         - { path: ^/activity_log, roles: IS_AUTHENTICATED }
