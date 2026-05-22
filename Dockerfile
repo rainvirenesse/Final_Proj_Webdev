@@ -26,7 +26,8 @@ COPY . .
 RUN chmod +x bin/railway-build.sh bin/railway-start.sh bin/railway-jwt-keys.sh
 
 # Build-time defaults; Railway injects real values at runtime.
-ENV APP_ENV=prod \
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    APP_ENV=prod \
     APP_DEBUG=0 \
     APP_SECRET=build-time-secret-change-in-railway \
     DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.0&charset=utf8mb4" \

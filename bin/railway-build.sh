@@ -14,13 +14,16 @@ export JWT_PASSPHRASE="${JWT_PASSPHRASE:-build-time-passphrase}"
 export JWT_SECRET_KEY="${JWT_SECRET_KEY:-config/jwt/private.pem}"
 export JWT_PUBLIC_KEY="${JWT_PUBLIC_KEY:-config/jwt/public.pem}"
 
+# Docker/Railway builds run as root; Composer disables plugins unless this is set.
+# Symfony Flex + Runtime plugins are required (vendor/autoload_runtime.php).
+export COMPOSER_ALLOW_SUPERUSER=1
+
 echo "==> Composer install (production)"
 composer install \
     --no-dev \
     --optimize-autoloader \
     --classmap-authoritative \
-    --no-interaction \
-    --no-scripts
+    --no-interaction
 
 bash bin/railway-jwt-keys.sh
 
