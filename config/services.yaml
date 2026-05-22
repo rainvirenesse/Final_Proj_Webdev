@@ -12,6 +12,9 @@ parameters:
     env(JWT_SECRET_KEY): '%kernel.project_dir%/config/jwt/private.pem'
     env(JWT_PUBLIC_KEY): '%kernel.project_dir%/config/jwt/public.pem'
     env(JWT_PASSPHRASE): ''
+    # Defaults for %env(default:...:VAR)% processors (Railway-safe when VAR is unset).
+    messenger_transport_dsn_default: 'doctrine://default?queue_name=messages'
+    mailer_dsn_default: 'null://null'
     app.url: '%env(APP_URL)%'
 
 services:

@@ -13,6 +13,8 @@ export CORS_ALLOW_ORIGIN="${CORS_ALLOW_ORIGIN:-'^https?://.*'}"
 export JWT_PASSPHRASE="${JWT_PASSPHRASE:-build-time-passphrase}"
 export JWT_SECRET_KEY="${JWT_SECRET_KEY:-config/jwt/private.pem}"
 export JWT_PUBLIC_KEY="${JWT_PUBLIC_KEY:-config/jwt/public.pem}"
+export MESSENGER_TRANSPORT_DSN="${MESSENGER_TRANSPORT_DSN:-doctrine://default?queue_name=messages}"
+export MAILER_DSN="${MAILER_DSN:-null://null}"
 
 # Docker/Railway builds run as root; Composer disables plugins unless this is set.
 # Symfony Flex + Runtime plugins are required (vendor/autoload_runtime.php).

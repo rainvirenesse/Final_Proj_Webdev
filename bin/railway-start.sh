@@ -6,6 +6,10 @@ cd "$(dirname "$0")/.."
 export APP_ENV="${APP_ENV:-prod}"
 export APP_DEBUG="${APP_DEBUG:-0}"
 
+# Required by Symfony prod container; set in Railway Variables to override.
+export MESSENGER_TRANSPORT_DSN="${MESSENGER_TRANSPORT_DSN:-doctrine://default?queue_name=messages}"
+export MAILER_DSN="${MAILER_DSN:-null://null}"
+
 if [[ -z "${APP_SECRET:-}" || "${APP_SECRET}" == "change-me-to-a-random-32-char-secret" ]]; then
     echo "ERROR: Set APP_SECRET in Railway service variables." >&2
     exit 1

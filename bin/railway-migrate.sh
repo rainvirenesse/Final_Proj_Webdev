@@ -17,5 +17,7 @@ while [[ "$attempt" -le "$MAX_ATTEMPTS" ]]; do
     attempt=$((attempt + 1))
 done
 
-echo "ERROR: Could not connect to MySQL after ${MAX_ATTEMPTS} attempts." >&2
+echo "ERROR: Migrations failed after ${MAX_ATTEMPTS} attempts." >&2
+echo "  If logs mention MESSENGER_TRANSPORT_DSN or MAILER_DSN, redeploy latest code or add those variables in Railway." >&2
+echo "  If logs mention Connection refused, fix DATABASE_URL (Reference → MySQL → MYSQL_URL)." >&2
 exit 1
