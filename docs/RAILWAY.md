@@ -27,7 +27,7 @@ flowchart LR
 | `APP_ENV` | `prod` |
 | `APP_DEBUG` | `0` |
 | `APP_SECRET` | Random string (e.g. `php -r "echo bin2hex(random_bytes(16));"`) |
-| `DATABASE_URL` | From MySQL: use **Reference** → `${{MySQL.MYSQL_URL}}` or build: `mysql://${{MYSQLUSER}}:${{MYSQLPASSWORD}}@${{MYSQLHOST}}:${{MYSQLPORT}}/${{MYSQLDATABASE}}?serverVersion=8.0&charset=utf8mb4` |
+| `DATABASE_URL` | **Required on the web service.** Variables → **Add Reference** → choose your **MySQL** service → **`MYSQL_URL`** (private network). Do **not** use `127.0.0.1` or the Dockerfile build placeholder. |
 | `APP_URL` | Public HTTPS URL of the app, e.g. `https://rain-api-production.up.railway.app` (no trailing slash) |
 | `DEFAULT_URI` | Same as `APP_URL` |
 | `JWT_PASSPHRASE` | Long random secret (used when generating PEM keys) |
@@ -120,11 +120,28 @@ Full reference: [API_CUSTOMER.md](./API_CUSTOMER.md)
 
 | Symptom | Fix |
 |---------|-----|
+| **`Connection refused` on migrations** | `DATABASE_URL` missing or pointing at `127.0.0.1`. See below. |
 | 401 on cart/orders | Log in again; check `JWT_*` keys and `JWT_PASSPHRASE` unchanged across deploys |
 | Wrong `imageUrl` | Set `APP_URL` to the public HTTPS domain |
 | 500 on startup | Check `DATABASE_URL`, MySQL service running, migrations in deploy logs |
 | CORS in browser | Adjust `CORS_ALLOW_ORIGIN` |
 | Build fails on JWT | Set `JWT_PASSPHRASE` or `JWT_*_B64` before build |
+
+### `SQLSTATE[HY000] [2002] Connection refused`
+
+The **web** service cannot reach MySQL. Fix in Railway (not in code):
+
+1. Open your **Symfony / web** service (not the MySQL service).
+2. Go to **Variables**.
+3. Add or edit **`DATABASE_URL`**:
+   - Click **+ New Variable** → **Add Reference**
+   - Select your **MySQL** service
+   - Choose **`MYSQL_URL`** (private URL, host like `*.railway.internal`)
+4. **Do not** set `DATABASE_URL` to `127.0.0.1` or paste only `MYSQL_PUBLIC_URL` unless you know you need external access.
+5. If `MYSQL_URL` has no `?serverVersion=…`, append: `?serverVersion=8.0.31&charset=utf8mb4` (use `&` if the URL already has `?`).
+6. **Redeploy** the web service.
+
+In deploy logs you should see: `Running database migrations (host: …railway.internal…)` — not `127.0.0.1`.
 
 ## 10. Local parity
 

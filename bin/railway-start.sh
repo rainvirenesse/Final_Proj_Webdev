@@ -12,7 +12,16 @@ if [[ -z "${APP_SECRET:-}" || "${APP_SECRET}" == "change-me-to-a-random-32-char-
 fi
 
 if [[ -z "${DATABASE_URL:-}" ]]; then
-    echo "ERROR: Set DATABASE_URL (use Railway MySQL MYSQL_URL reference)." >&2
+    echo "ERROR: DATABASE_URL is not set on this Railway service." >&2
+    echo "  Fix: web service → Variables → New Variable → Reference → MySQL → MYSQL_URL" >&2
+    echo "  Or set: mysql://\${{MYSQLUSER}}:\${{MYSQLPASSWORD}}@\${{MYSQLHOST}}:\${{MYSQLPORT}}/\${{MYSQLDATABASE}}?serverVersion=8.0.31&charset=utf8mb4" >&2
+    exit 1
+fi
+
+if [[ "${DATABASE_URL}" == *"@127.0.0.1"* || "${DATABASE_URL}" == *"@localhost"* || "${DATABASE_URL}" == *"//build:build@"* ]]; then
+    echo "ERROR: DATABASE_URL points to localhost/build placeholder, not Railway MySQL." >&2
+    echo "  Current value starts with: ${DATABASE_URL%%@*}@..." >&2
+    echo "  Fix: Variables → DATABASE_URL → Reference → select your MySQL service → MYSQL_URL" >&2
     exit 1
 fi
 
@@ -28,8 +37,8 @@ bash bin/railway-jwt-keys.sh
 mkdir -p var/cache var/log public/images/products public/uploads/products
 chmod -R ug+rwx var public/images/products public/uploads/products 2>/dev/null || true
 
-echo "==> Running database migrations"
-php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=prod
+echo "==> Running database migrations (host: $(php -r 'echo parse_url(getenv("DATABASE_URL"), PHP_URL_HOST) ?: "unknown";'))"
+bash bin/railway-migrate.sh
 
 echo "==> Warming cache"
 php bin/console cache:warmup --env=prod --no-interaction

@@ -23,22 +23,22 @@ WORKDIR /app
 
 COPY . .
 
-RUN chmod +x bin/railway-build.sh bin/railway-start.sh bin/railway-jwt-keys.sh
+RUN chmod +x bin/railway-build.sh bin/railway-start.sh bin/railway-jwt-keys.sh bin/railway-migrate.sh
 
-# Build-time defaults; Railway injects real values at runtime.
-ENV COMPOSER_ALLOW_SUPERUSER=1 \
-    APP_ENV=prod \
+# Build-time only (not persisted — runtime DATABASE_URL must come from Railway MySQL).
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+RUN APP_ENV=prod \
     APP_DEBUG=0 \
     APP_SECRET=build-time-secret-change-in-railway \
-    DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.0&charset=utf8mb4" \
+    DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.0.31&charset=utf8mb4" \
     APP_URL=http://localhost \
     DEFAULT_URI=http://localhost \
     CORS_ALLOW_ORIGIN='^https?://.*' \
     JWT_PASSPHRASE=build-time-passphrase \
     JWT_SECRET_KEY=config/jwt/private.pem \
-    JWT_PUBLIC_KEY=config/jwt/public.pem
-
-RUN bash bin/railway-build.sh
+    JWT_PUBLIC_KEY=config/jwt/public.pem \
+    bash bin/railway-build.sh
 
 EXPOSE 8000
 
