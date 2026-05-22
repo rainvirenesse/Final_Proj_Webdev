@@ -52,12 +52,14 @@ Set only `JWT_PASSPHRASE`. Keys are created during `bin/railway-build.sh`. **Red
 
 ## 3. Build and start commands
 
-Configured in `railway.toml` and `nixpacks.toml`:
+Configured in `Dockerfile` + `railway.toml`:
 
-| Phase | Script |
-|-------|--------|
-| Build | `bash bin/railway-build.sh` |
-| Start | `bash bin/railway-start.sh` |
+| Phase | What runs |
+|-------|-----------|
+| Build | `Dockerfile` → `bin/railway-build.sh` (Composer + Symfony cache) |
+| Start | `bin/railway-start.sh` (migrations + PHP server on `$PORT`) |
+
+If a deploy log shows `composer: command not found` with `--ignore-platform-reqs`, Railway used the wrong auto-builder — ensure `Dockerfile` is committed and `railway.toml` sets `builder = "DOCKERFILE"`.
 
 Start script runs **migrations**, warms **cache**, ensures upload directories exist, then serves `public/` on `$PORT`.
 

@@ -1,0 +1,15 @@
+.git
+.github
+.env
+.env.*
+!.env.dist
+var/
+vendor/
+node_modules/
+public/build/
+.phpunit.cache
+tests/
+app-integration/
+docs/
+*.md
+!README.md

@@ -4,8 +4,9 @@
 # 3. Set DATABASE_URL from the MySQL service reference variable MYSQL_URL / MYSQL_PUBLIC_URL.
 
 [build]
-builder = "NIXPACKS"
-buildCommand = "bash bin/railway-build.sh"
+# Use Dockerfile (includes PHP + Composer). Nixpacks/Railpack auto-builds often miss composer.
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "bash bin/railway-start.sh"
