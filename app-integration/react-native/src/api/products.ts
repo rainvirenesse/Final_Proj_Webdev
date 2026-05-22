@@ -7,6 +7,8 @@ export type Product = {
   price: number;
   status: string;
   stock: number;
+  inventoryStock?: number;
+  inStock?: boolean;
   category?: string | null;
   image?: string | null;
   imagePath?: string | null;
@@ -28,9 +30,9 @@ export function resolveProductImageUri(product: Product, apiUrl: string): string
 }
 
 export async function fetchProducts(): Promise<Product[]> {
-  return apiRequest<Product[]>('/api/customer/products');
+  return apiRequest<Product[]>('/api/products');
 }
 
 export async function fetchProduct(id: number): Promise<Product> {
-  return apiRequest<Product>(`/api/customer/products/${id}`);
+  return apiRequest<Product>(`/api/products/${id}`);
 }

@@ -21,7 +21,7 @@ class Cart
     private ?User $user = null;
 
     /** @var Collection<int, CartItem> */
-    #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartItem::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $items;
 
     #[ORM\Column(type: 'datetime_immutable')]
@@ -60,17 +60,21 @@ class Cart
     {
         if (!$this->items->contains($item)) {
             $this->items->add($item);
-            $item->setCart($this);
+            if ($item->getCart() !== $this) {
+                $item->setCart($this);
+            }
         }
 
         return $this;
     }
 
+    /**
+     * Remove from the in-memory collection only. Do not null the owning side here;
+     * use EntityManager::remove() or orphanRemoval via collection removal on flush.
+     */
     public function removeItem(CartItem $item): self
     {
-        if ($this->items->removeElement($item) && $item->getCart() === $this) {
-            $item->setCart(null);
-        }
+        $this->items->removeElement($item);
 
         return $this;
     }

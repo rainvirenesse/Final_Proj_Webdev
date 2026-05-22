@@ -6,6 +6,7 @@ use App\Entity\CustomerOrder;
 use App\Entity\OrderItem;
 use App\Entity\Product;
 use App\Entity\User;
+use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\CustomerOrderRepository;
 use App\Service\OrderNumberGenerator;
@@ -17,7 +18,7 @@ final class CustomerOrderApiService
         private readonly EntityManagerInterface $em,
         private readonly CustomerOrderRepository $orderRepository,
         private readonly CartRepository $cartRepository,
-        private readonly CustomerCartService $cartService,
+        private readonly CartItemRepository $cartItemRepository,
         private readonly OrderNumberGenerator $orderNumberGenerator,
     ) {
     }
@@ -72,7 +73,7 @@ final class CustomerOrderApiService
 
         $total = 0.0;
 
-        foreach ($cart->getItems() as $cartItem) {
+        foreach ($cart->getItems()->toArray() as $cartItem) {
             $product = $cartItem->getProduct();
             if (!$product instanceof Product) {
                 continue;
@@ -94,17 +95,18 @@ final class CustomerOrderApiService
 
             $total += $cartItem->getLineTotal();
             $product->setStock($product->getStock() - $cartItem->getQuantity());
-            if ($product->getStock() === 0) {
-                $product->setStatus(Product::STATUS_OUT_OF_STOCK);
-            }
         }
 
         $order->setTotalPrice(number_format($total, 2, '.', ''));
 
+        $cartId = $cart->getId();
         $this->em->persist($order);
         $this->em->flush();
 
-        $this->cartService->clearCart($user);
+        if ($cartId !== null) {
+            $this->cartItemRepository->deleteAllForCartId($cartId);
+            $this->cartRepository->touchCartById($cartId);
+        }
 
         return $order;
     }
@@ -142,9 +144,6 @@ final class CustomerOrderApiService
             $product = $item->getProduct();
             if ($product) {
                 $product->setStock($product->getStock() + (int) $item->getQuantity());
-                if ($product->getStatus() === Product::STATUS_OUT_OF_STOCK && $product->getStock() > 0) {
-                    $product->setStatus(Product::STATUS_ACTIVE);
-                }
             }
         }
 

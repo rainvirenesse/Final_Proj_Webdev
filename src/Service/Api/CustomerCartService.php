@@ -6,15 +6,22 @@ use App\Entity\Cart;
 use App\Entity\CartItem;
 use App\Entity\Product;
 use App\Entity\User;
+use App\Exception\ProductOutOfStockException;
+use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Cart mutations avoid bidirectional nulling and duplicate cascade remove paths
+ * that can cause Doctrine UnitOfWork infinite scheduling loops on flush.
+ */
 final class CustomerCartService
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly CartRepository $cartRepository,
+        private readonly CartItemRepository $cartItemRepository,
         private readonly ProductRepository $productRepository,
         private readonly ProductSerializer $productSerializer,
     ) {
@@ -76,32 +83,29 @@ final class CustomerCartService
 
         $product = $this->productRepository->find($productId);
         if (!$product instanceof Product) {
-            throw new \InvalidArgumentException('Product not found.');
+            throw new \InvalidArgumentException(sprintf(
+                'Product with id %d was not found. Call GET /api/products and use an id from the response.',
+                $productId
+            ));
         }
-        if ($product->getStatus() !== Product::STATUS_ACTIVE) {
-            throw new \InvalidArgumentException('Product is not available for purchase.');
-        }
-        if ($product->getStock() < $quantity) {
-            throw new \InvalidArgumentException(sprintf('Only %d unit(s) in stock.', $product->getStock()));
-        }
+
+        $this->assertProductAvailableForCart($product, $quantity);
 
         $cart = $this->getOrCreateCart($user);
 
-        foreach ($cart->getItems() as $existing) {
-            if ($existing->getProduct()?->getId() === $product->getId()) {
-                $newQty = $existing->getQuantity() + $quantity;
-                if ($product->getStock() < $newQty) {
-                    throw new \InvalidArgumentException(sprintf('Only %d unit(s) in stock.', $product->getStock()));
-                }
-                $existing->setQuantity($newQty);
-                $cart->touch();
-                $this->em->flush();
+        $existing = $this->cartItemRepository->findOneByCartAndProduct($cart, $product);
+        if ($existing instanceof CartItem) {
+            $newQty = $existing->getQuantity() + $quantity;
+            $this->assertProductAvailableForCart($product, $newQty);
+            $existing->setQuantity($newQty);
+            $cart->touch();
+            $this->em->flush();
 
-                return $existing;
-            }
+            return $existing;
         }
 
         $item = new CartItem();
+        $item->setCart($cart);
         $item->setProduct($product);
         $item->setQuantity($quantity);
         $item->setUnitPrice((string) $product->getPrice());
@@ -121,9 +125,11 @@ final class CustomerCartService
 
         $item = $this->findOwnedItem($user, $cartItemId);
         $product = $item->getProduct();
-        if (!$product || $product->getStock() < $quantity) {
-            throw new \InvalidArgumentException('Insufficient stock for this quantity.');
+        if (!$product) {
+            throw new \InvalidArgumentException('Cart item not found.');
         }
+
+        $this->assertProductAvailableForCart($product, $quantity);
 
         $item->setQuantity($quantity);
         $item->getCart()?->touch();
@@ -132,41 +138,61 @@ final class CustomerCartService
         return $item;
     }
 
-    public function removeItem(User $user, int $cartItemId): void
+    public function removeItem(User $user, int $cartItemId): Cart
     {
         $item = $this->findOwnedItem($user, $cartItemId);
         $cart = $item->getCart();
-        if ($cart) {
-            $cart->removeItem($item);
-            $cart->touch();
+        if (!$cart) {
+            throw new \InvalidArgumentException('Cart item not found.');
         }
+
         $this->em->remove($item);
+        $cart->touch();
         $this->em->flush();
+
+        $reloaded = $this->cartRepository->findOneByUser($user);
+
+        return $reloaded ?? $cart;
     }
 
     public function clearCart(User $user): void
     {
-        $cart = $this->cartRepository->findOneByUser($user);
-        if (!$cart) {
+        $cartId = $this->cartRepository->findCartIdForUser($user);
+        if ($cartId === null) {
             return;
         }
-        foreach ($cart->getItems()->toArray() as $item) {
-            $cart->removeItem($item);
-            $this->em->remove($item);
+
+        $this->cartItemRepository->deleteAllForCartId($cartId);
+        $this->cartRepository->touchCartById($cartId);
+    }
+
+    /**
+     * Blocks cart mutations when inventory is zero or the product is not sellable.
+     *
+     * @throws ProductOutOfStockException
+     */
+    private function assertProductAvailableForCart(Product $product, int $requestedQuantity): void
+    {
+        if ($product->getStatus() === Product::STATUS_INACTIVE) {
+            throw new \InvalidArgumentException('Product is not available for purchase.');
         }
-        $cart->touch();
-        $this->em->flush();
+
+        if ($product->getStock() <= 0 || $product->getStatus() === Product::STATUS_OUT_OF_STOCK) {
+            throw new ProductOutOfStockException();
+        }
+
+        if ($product->getStock() < $requestedQuantity) {
+            throw new \InvalidArgumentException(sprintf('Only %d unit(s) in stock.', $product->getStock()));
+        }
     }
 
     private function findOwnedItem(User $user, int $cartItemId): CartItem
     {
-        $cart = $this->getOrCreateCart($user);
-        foreach ($cart->getItems() as $item) {
-            if ($item->getId() === $cartItemId) {
-                return $item;
-            }
+        $item = $this->cartItemRepository->findOneForUser($user, $cartItemId);
+        if (!$item instanceof CartItem) {
+            throw new \InvalidArgumentException('Cart item not found.');
         }
 
-        throw new \InvalidArgumentException('Cart item not found.');
+        return $item;
     }
 }

@@ -18,7 +18,7 @@ final class OrderController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_orders_list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
         $orders = $this->orderService->listForUser($this->requireUser());
         $data = array_map(
             fn ($o) => $this->orderService->serializeOrder($o, false),
@@ -31,7 +31,7 @@ final class OrderController extends AbstractCustomerApiController
     #[Route('/{id}', name: 'api_customer_orders_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
         $order = $this->orderService->findForUser($this->requireUser(), $id);
         if (!$order) {
             return ApiResponse::error('Order not found.', 404);
@@ -43,7 +43,7 @@ final class OrderController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_orders_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
         $data = $this->decodeJson($request);
         $notes = isset($data['notes']) ? trim((string) $data['notes']) : null;
 
@@ -59,7 +59,7 @@ final class OrderController extends AbstractCustomerApiController
     #[Route('/{id}', name: 'api_customer_orders_update', methods: ['PUT'], requirements: ['id' => '\d+'])]
     public function update(int $id, Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
         $data = $this->decodeJson($request);
 
         if (!\array_key_exists('notes', $data)) {
@@ -82,7 +82,7 @@ final class OrderController extends AbstractCustomerApiController
     #[Route('/{id}', name: 'api_customer_orders_delete', methods: ['DELETE'], requirements: ['id' => '\d+'])]
     public function cancel(int $id): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
 
         try {
             $order = $this->orderService->cancel($this->requireUser(), $id);

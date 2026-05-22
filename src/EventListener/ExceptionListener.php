@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Api\ApiResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -46,8 +47,11 @@ class ExceptionListener implements EventSubscriberInterface
             if ($this->isApiRequest($request)) {
                 $user = $request->getUser();
                 $status = $user ? Response::HTTP_FORBIDDEN : Response::HTTP_UNAUTHORIZED;
-                $body = ['error' => $user ? 'Access denied' : 'Authentication required'];
-                $event->setResponse(new JsonResponse($body, $status));
+                $message = $exception->getMessage() ?: ($user ? 'Access denied' : 'Authentication required');
+                if ($user && str_contains($message, 'ROLE_CUSTOMER')) {
+                    $message = 'This endpoint is for customer accounts only. Log in with a customer account via POST /api/login (not staff/admin).';
+                }
+                $event->setResponse(ApiResponse::error($message, $status));
                 return;
             }
 
@@ -91,10 +95,7 @@ class ExceptionListener implements EventSubscriberInterface
         // Handle Authentication Exceptions
         if ($exception instanceof AuthenticationException) {
             if ($this->isApiRequest($request)) {
-                $event->setResponse(new JsonResponse(
-                    ['error' => 'Authentication required'],
-                    Response::HTTP_UNAUTHORIZED
-                ));
+                $event->setResponse(ApiResponse::error('Authentication required', Response::HTTP_UNAUTHORIZED));
                 return;
             }
 
@@ -152,13 +153,7 @@ class ExceptionListener implements EventSubscriberInterface
 
     private function isApiRequest(Request $request): bool
     {
-        if (str_starts_with($request->getPathInfo(), '/api')) {
-            return true;
-        }
-
-        $accept = (string) $request->headers->get('Accept', '');
-
-        return str_contains($accept, 'application/json');
+        return str_starts_with($request->getPathInfo(), '/api');
     }
 }
 

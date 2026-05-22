@@ -1,0 +1,7 @@
+# Production settings for reverse proxies (Railway terminates TLS at the edge).
+framework:
+    trusted_proxies: 'private_ranges'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
+    session:
+        cookie_secure: auto
+        cookie_samesite: lax

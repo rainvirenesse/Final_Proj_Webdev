@@ -25,9 +25,17 @@ export async function apiRequest<T>(
   const body = await res.json().catch(() => ({}));
 
   if (!res.ok) {
+    const message = body.message ?? body.error ?? 'Request failed';
     const err: ApiError = {
       status: res.status,
-      error: body.error ?? body.message ?? 'Request failed',
+      error:
+        res.status === 401
+          ? message.includes('expired')
+            ? message
+            : `Authentication failed (${message}). Log in again and ensure the app sends Authorization: Bearer <token>.`
+          : res.status === 403
+            ? `Access denied (${message}). Use a customer account, not staff/admin.`
+            : message,
       code: body.code ?? res.status,
       violations: body.violations,
     };

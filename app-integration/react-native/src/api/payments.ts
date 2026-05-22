@@ -22,8 +22,8 @@ export async function processPayment(
   reference?: string,
 ): Promise<PaymentStatus> {
   return apiRequest<PaymentStatus>(
-    `/api/customer/orders/${orderId}/payment`,
-    { method: 'POST', body: JSON.stringify({ method, reference }) },
+    '/api/payments',
+    { method: 'POST', body: JSON.stringify({ orderId, method, reference }) },
     token,
   );
 }

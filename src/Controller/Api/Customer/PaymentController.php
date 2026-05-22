@@ -19,7 +19,7 @@ final class PaymentController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_payment_show', methods: ['GET'])]
     public function show(int $orderId): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
 
         try {
             return ApiResponse::success($this->paymentService->getPaymentStatus($this->requireUser(), $orderId));
@@ -31,7 +31,7 @@ final class PaymentController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_payment_process', methods: ['POST'])]
     public function process(int $orderId, Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
 
         try {
             $result = $this->paymentService->processPayment(

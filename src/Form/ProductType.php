@@ -78,7 +78,8 @@ class ProductType extends AbstractType
                     'Out of Stock' => Product::STATUS_OUT_OF_STOCK,
                 ],
                 'attr' => ['class' => 'form-control'],
-                'label' => 'Status'
+                'label' => 'Status',
+                'help' => 'Status updates automatically from stock: 0 = Out of Stock; restocking an out-of-stock item sets Active. Inactive is kept unless you change it manually.',
             ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Product image',

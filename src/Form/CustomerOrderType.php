@@ -171,6 +171,7 @@ class CustomerOrderType extends AbstractType
                     ],
                     'attr' => ['class' => 'form-control'],
                     'label' => 'Payment Status',
+                    'help' => 'Orders with status Pending must be Unpaid. Mark as Paid or Partially Paid when processing payment (status will move to In Progress).',
                     'constraints' => [
                         new Assert\NotBlank(['message' => 'Payment status is required.']),
                         new Assert\Choice([
@@ -180,7 +181,20 @@ class CustomerOrderType extends AbstractType
                                 CustomerOrder::PAYMENT_PARTIALLY_PAID
                             ],
                             'message' => 'Invalid payment status.'
-                        ])
+                        ]),
+                        new Assert\Callback([
+                            'callback' => function ($value, ExecutionContextInterface $context): void {
+                                $order = $context->getRoot()->getData();
+                                if (
+                                    $order instanceof CustomerOrder
+                                    && $order->getStatus() === CustomerOrder::STATUS_PENDING
+                                    && $value !== CustomerOrder::PAYMENT_UNPAID
+                                ) {
+                                    $context->buildViolation('Pending orders must have payment status Unpaid.')
+                                        ->addViolation();
+                                }
+                            },
+                        ]),
                     ]
                 ]);
         }

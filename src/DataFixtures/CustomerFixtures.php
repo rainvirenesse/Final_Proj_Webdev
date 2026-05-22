@@ -63,7 +63,8 @@ class CustomerFixtures extends Fixture
             $customer = new User();
             $customer->setEmail($customerData['email']);
             $customer->setUsername($customerData['username']);
-            $customer->setRoles(['ROLE_USER']);
+            $customer->setRoles(['ROLE_CUSTOMER']);
+            $customer->setIsVerified(true);
             $customer->setStatus(User::STATUS_ACTIVE);
             $hashedPassword = $this->passwordHasher->hashPassword($customer, $customerData['password']);
             $customer->setPassword($hashedPassword);

@@ -40,14 +40,28 @@ class APILoginController extends AbstractController
             return new JsonResponse(['error' => 'Please verify your email before logging in.'], 403);
         }
 
+        $roles = $user->getRoles();
+        if (\in_array('ROLE_ADMIN', $roles, true) || \in_array('ROLE_STAFF', $roles, true)) {
+            return new JsonResponse([
+                'error' => 'This login is for customer accounts only. Staff and admin must use the web dashboard.',
+            ], 403);
+        }
+
         $token = $jwtManager->create($user);
 
         return new JsonResponse([
+            'status' => 'success',
+            'code' => 200,
             'token' => $token,
-            'user' => [
-                'id' => $user->getId(),
-                'email' => $user->getEmail()
-            ]
+            'data' => [
+                'token' => $token,
+                'user' => [
+                    'id' => $user->getId(),
+                    'email' => $user->getEmail(),
+                    'username' => $user->getUsername(),
+                    'roles' => $user->getRoles(),
+                ],
+            ],
         ]);
     }
 }

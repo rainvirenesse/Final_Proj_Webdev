@@ -94,8 +94,12 @@ class CustomerOrder
     )]
     private ?string $notes = null;
 
-    #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderItem::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $orderItems;
+
+    /** @var Collection<int, Payment> */
+    #[ORM\OneToMany(mappedBy: 'order', targetEntity: Payment::class, cascade: ['persist'])]
+    private Collection $payments;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -110,6 +114,7 @@ class CustomerOrder
     public function __construct()
     {
         $this->orderItems = new ArrayCollection();
+        $this->payments = new ArrayCollection();
     }
 
     // --------------------
@@ -136,6 +141,8 @@ class CustomerOrder
         if ($this->orderedAt < $now->setTime(0, 0, 0)) {
             $this->orderedAt = $now;
         }
+
+        $this->enforcePendingUnpaid();
     }
 
     #[ORM\PreUpdate]
@@ -147,6 +154,16 @@ class CustomerOrder
             if ($this->orderedAt < $now->setTime(0, 0, 0)) {
                 throw new \InvalidArgumentException('Order date cannot be before the current date.');
             }
+        }
+
+        $this->enforcePendingUnpaid();
+        $this->syncPaymentStatusWithOrderStatus();
+    }
+
+    private function enforcePendingUnpaid(): void
+    {
+        if ($this->status === self::STATUS_PENDING) {
+            $this->paymentStatus = self::PAYMENT_UNPAID;
         }
     }
 
@@ -203,6 +220,10 @@ class CustomerOrder
         }
         
         $this->status = $status;
+
+        if ($status === self::STATUS_PENDING) {
+            $this->paymentStatus = self::PAYMENT_UNPAID;
+        }
         
         // Set completedAt when status changes to COMPLETED
         if ($status === self::STATUS_COMPLETED && $this->completedAt === null) {
@@ -241,7 +262,23 @@ class CustomerOrder
     public function setPaymentStatus(string $paymentStatus): self
     {
         $this->paymentStatus = $paymentStatus;
+        $this->syncPaymentStatusWithOrderStatus();
+
         return $this;
+    }
+
+    /**
+     * Pending orders are always unpaid. Paid/partial payment moves the order to In Progress.
+     */
+    public function syncPaymentStatusWithOrderStatus(): void
+    {
+        if ($this->status === self::STATUS_PENDING) {
+            if ($this->paymentStatus === self::PAYMENT_UNPAID) {
+                return;
+            }
+
+            $this->status = self::STATUS_IN_PROGRESS;
+        }
     }
 
     public function getOrderedAt(): ?\DateTimeImmutable
@@ -303,11 +340,26 @@ class CustomerOrder
 
     public function removeOrderItem(OrderItem $orderItem): self
     {
-        if ($this->orderItems->removeElement($orderItem)) {
-            if ($orderItem->getOrder() === $this) {
-                $orderItem->setOrder(null);
-            }
+        $this->orderItems->removeElement($orderItem);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Payment>
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): self
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments->add($payment);
+            $payment->setOrder($this);
         }
+
         return $this;
     }
 

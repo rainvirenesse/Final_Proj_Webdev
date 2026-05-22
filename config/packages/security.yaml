@@ -3,6 +3,7 @@ security:
     role_hierarchy:
         ROLE_ADMIN: [ROLE_STAFF, ROLE_USER]
         ROLE_STAFF: [ROLE_USER]
+        ROLE_CUSTOMER: [ROLE_USER]
 
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
@@ -62,7 +63,8 @@ security:
         api_platform:
             pattern: ^/api
             stateless: true
-            provider: app_username_provider
+            # Must match User::getUserIdentifier() (email) — JWT subject is email, not username.
+            provider: app_user_provider
             user_checker: App\Security\UserChecker
             jwt: ~
 
@@ -119,7 +121,8 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify-email, roles: PUBLIC_ACCESS }
         - { path: ^/api/customer/products, roles: PUBLIC_ACCESS }
-        - { path: ^/api/customer, roles: ROLE_USER }
+        # Authenticated customers (ROLE_USER in DB + runtime ROLE_CUSTOMER). Staff/admin blocked in controllers via CustomerApiVoter.
+        - { path: ^/api/(cart|orders|payments|customer), roles: ROLE_USER }
         - { path: ^/api, roles: IS_AUTHENTICATED }
         # - { path: ^/user, roles: IS_AUTHENTICATED }
         - { path: ^/activity_log, roles: IS_AUTHENTICATED }

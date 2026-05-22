@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
+use App\Api\ApiResponse;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTExpiredEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTInvalidEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTNotFoundEvent;
@@ -33,7 +34,7 @@ final class LexikJwtFailureResponseSubscriber implements EventSubscriberInterfac
 
         // For direct browser hits to /api, avoid leaking implementation details.
         if ($normalized === '/api') {
-            $event->setResponse(new JsonResponse(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
+            $event->setResponse(ApiResponse::error('Not found', Response::HTTP_NOT_FOUND));
             return;
         }
 
@@ -54,9 +55,6 @@ final class LexikJwtFailureResponseSubscriber implements EventSubscriberInterfac
 
     private function json401(string $error): JsonResponse
     {
-        return new JsonResponse([
-            'error' => $error,
-            'code' => Response::HTTP_UNAUTHORIZED,
-        ], Response::HTTP_UNAUTHORIZED);
+        return ApiResponse::error($error, Response::HTTP_UNAUTHORIZED);
     }
 }

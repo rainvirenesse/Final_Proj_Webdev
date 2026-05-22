@@ -3,7 +3,9 @@
 namespace App\Service\Api;
 
 use App\Entity\CustomerOrder;
+use App\Entity\Payment;
 use App\Entity\User;
+use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class CustomerPaymentService
@@ -11,6 +13,7 @@ final class CustomerPaymentService
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly CustomerOrderApiService $orderApiService,
+        private readonly PaymentRepository $paymentRepository,
     ) {
     }
 
@@ -28,7 +31,7 @@ final class CustomerPaymentService
     }
 
     /**
-     * @param array{method?: string, reference?: string} $payload
+     * @param array{method?: string, reference?: string, orderId?: int} $payload
      *
      * @return array<string, mixed>
      */
@@ -55,30 +58,51 @@ final class CustomerPaymentService
             $reference = 'PAY-'.strtoupper(bin2hex(random_bytes(4)));
         }
 
+        $payment = new Payment();
+        $payment->setOrder($order);
+        $payment->setMethod($method);
+        $payment->setTransactionReference($reference);
+        $payment->setAmount($order->getTotalPrice() ?? '0.00');
+        $payment->setStatus(Payment::STATUS_COMPLETED);
+        $order->addPayment($payment);
         $order->setPaymentStatus(CustomerOrder::PAYMENT_PAID);
+        // Pending + paid is invalid; payment advances the order to In Progress.
+        if ($order->getStatus() === CustomerOrder::STATUS_PENDING) {
+            $order->setStatus(CustomerOrder::STATUS_IN_PROGRESS);
+        }
+
         $note = trim((string) ($order->getNotes() ?? ''));
         $paymentNote = sprintf('[Paid via %s, ref: %s]', $method, $reference);
         $order->setNotes($note === '' ? $paymentNote : $note."\n".$paymentNote);
 
+        $this->em->persist($payment);
         $this->em->flush();
 
-        return $this->serializePayment($order, $method, $reference);
+        return $this->serializePayment($order, $payment);
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function serializePayment(CustomerOrder $order, ?string $method = null, ?string $reference = null): array
+    private function serializePayment(CustomerOrder $order, ?Payment $payment = null): array
     {
+        $payment ??= $this->paymentRepository->findLatestForOrder($order);
+
         return [
             'orderId' => $order->getId(),
             'orderNumber' => $order->getOrderNumber(),
             'paymentStatus' => $order->getPaymentStatus(),
             'totalPrice' => (float) $order->getTotalPrice(),
             'orderStatus' => $order->getStatus(),
-            'method' => $method,
-            'reference' => $reference,
             'paid' => $order->getPaymentStatus() === CustomerOrder::PAYMENT_PAID,
+            'payment' => $payment ? [
+                'id' => $payment->getId(),
+                'transactionReference' => $payment->getTransactionReference(),
+                'status' => $payment->getStatus(),
+                'method' => $payment->getMethod(),
+                'amount' => (float) $payment->getAmount(),
+                'createdAt' => $payment->getCreatedAt()?->format(\DateTimeInterface::ATOM),
+            ] : null,
         ];
     }
 }

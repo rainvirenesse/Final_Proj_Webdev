@@ -1,0 +1,4 @@
+# Mobile apps often omit Origin; browsers / Expo web need permissive CORS in production.
+nelmio_cors:
+    defaults:
+        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']

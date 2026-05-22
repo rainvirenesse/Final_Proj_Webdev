@@ -48,7 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, CustomerOrder>
      */
-    #[ORM\OneToMany(targetEntity: CustomerOrder::class, mappedBy: 'client', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: CustomerOrder::class, mappedBy: 'client')]
     private Collection $customerOrders;
 
     #[ORM\Column(type: 'datetime_immutable')]
@@ -231,11 +231,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user has at least ROLE_USER
         if (empty($roles)) {
             $roles[] = 'ROLE_USER';
         }
-        return array_unique($roles);
+
+        // Customers registered with ROLE_USER also receive ROLE_CUSTOMER for API access.
+        if (
+            \in_array('ROLE_USER', $roles, true)
+            && !\in_array('ROLE_STAFF', $roles, true)
+            && !\in_array('ROLE_ADMIN', $roles, true)
+            && !\in_array('ROLE_CUSTOMER', $roles, true)
+        ) {
+            $roles[] = 'ROLE_CUSTOMER';
+        }
+
+        return array_values(array_unique($roles));
     }
 
     public function setRoles(array $roles): self

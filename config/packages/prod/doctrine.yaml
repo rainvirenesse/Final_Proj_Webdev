@@ -1,0 +1,7 @@
+doctrine:
+    dbal:
+        # Fallback when serverVersion is omitted from DATABASE_URL
+        server_version: '%env(default:doctrine.server_version:DOCTRINE_DBAL_SERVER_VERSION)%'
+
+parameters:
+    doctrine.server_version: '8.0'

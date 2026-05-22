@@ -23,7 +23,7 @@ final class ProfileController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_profile_show', methods: ['GET'])]
     public function show(): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
 
         return ApiResponse::success($this->serializeProfile($this->requireUser()));
     }
@@ -31,7 +31,7 @@ final class ProfileController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_profile_update', methods: ['PUT'])]
     public function update(Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
         $user = $this->requireUser();
         $data = $this->decodeJson($request);
 

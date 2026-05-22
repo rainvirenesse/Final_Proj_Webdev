@@ -7,6 +7,11 @@ parameters:
     user_images_directory: '%kernel.project_dir%/public/uploads/users'
     product_images_directory: '%kernel.project_dir%/public/images/products'
     env(APP_URL): 'http://127.0.0.1:8000'
+    env(DEFAULT_URI): '%env(APP_URL)%'
+    env(CORS_ALLOW_ORIGIN): '^https?://.*'
+    env(JWT_SECRET_KEY): '%kernel.project_dir%/config/jwt/private.pem'
+    env(JWT_PUBLIC_KEY): '%kernel.project_dir%/config/jwt/public.pem'
+    env(JWT_PASSPHRASE): ''
     app.url: '%env(APP_URL)%'
 
 services:

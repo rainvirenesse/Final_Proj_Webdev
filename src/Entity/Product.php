@@ -170,7 +170,27 @@ class Product
     public function setStock(int $stock): self
     {
         $this->stock = max(0, $stock);
+        $this->syncStatusFromStock();
+
         return $this;
+    }
+
+    /**
+     * Keeps sellable status aligned with on-hand quantity.
+     * - stock <= 0 → OUT_OF_STOCK
+     * - stock > 0 and was OUT_OF_STOCK → ACTIVE (INACTIVE is left unchanged)
+     */
+    public function syncStatusFromStock(): void
+    {
+        if ($this->stock <= 0) {
+            $this->status = self::STATUS_OUT_OF_STOCK;
+
+            return;
+        }
+
+        if ($this->status === self::STATUS_OUT_OF_STOCK) {
+            $this->status = self::STATUS_ACTIVE;
+        }
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
@@ -202,12 +222,14 @@ class Product
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->syncStatusFromStock();
     }
 
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+        $this->syncStatusFromStock();
     }
 }
 

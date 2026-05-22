@@ -22,8 +22,9 @@ final class CartController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_cart_show', methods: ['GET'])]
     public function show(): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
-        $cart = $this->cartService->getOrCreateCart($this->requireUser());
+        $this->requireCustomerApi();
+        $user = $this->requireUser();
+        $cart = $this->cartService->getOrCreateCart($user);
 
         return ApiResponse::success($this->cartService->serializeCart($cart));
     }
@@ -31,38 +32,28 @@ final class CartController extends AbstractCustomerApiController
     #[Route('/items', name: 'api_customer_cart_add_item', methods: ['POST'])]
     public function addItem(Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
-        $data = $this->decodeJson($request);
-
-        $violations = $this->validator->validate($data, new Assert\Collection([
-            'productId' => [new Assert\NotNull(), new Assert\Type('integer'), new Assert\Positive()],
-            'quantity' => [new Assert\Optional([new Assert\Type('integer'), new Assert\Positive()])],
-        ]));
-        if (\count($violations) > 0) {
-            return $this->validationError($violations);
-        }
-
+        $this->requireCustomerApi();
+        $user = $this->requireUser();
         try {
-            $item = $this->cartService->addItem(
-                $this->requireUser(),
-                (int) $data['productId'],
-                (int) ($data['quantity'] ?? 1)
+            $payload = $this->parseCartItemPayload($this->decodeJson($request));
+            $this->cartService->addItem(
+                $user,
+                $payload['productId'],
+                $payload['quantity']
             );
-            $cart = $item->getCart();
+            $cart = $this->cartService->getOrCreateCart($user);
 
-            return ApiResponse::created([
-                'itemId' => $item->getId(),
-                'cart' => $cart ? $this->cartService->serializeCart($cart) : null,
-            ]);
-        } catch (\InvalidArgumentException $e) {
-            return ApiResponse::error($e->getMessage(), 400);
+            return ApiResponse::created($this->cartService->serializeCart($cart));
+        } catch (\Throwable $e) {
+            return $this->mapCartAddException($e);
         }
     }
 
     #[Route('/items/{id}', name: 'api_customer_cart_update_item', methods: ['PUT'], requirements: ['id' => '\d+'])]
     public function updateItem(int $id, Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
+        $user = $this->requireUser();
         $data = $this->decodeJson($request);
 
         $violations = $this->validator->validate($data, new Assert\Collection([
@@ -73,30 +64,22 @@ final class CartController extends AbstractCustomerApiController
         }
 
         try {
-            $item = $this->cartService->updateItemQuantity(
-                $this->requireUser(),
-                $id,
-                (int) $data['quantity']
-            );
-            $cart = $item->getCart();
+            $this->cartService->updateItemQuantity($user, $id, (int) $data['quantity']);
+            $cart = $this->cartService->getOrCreateCart($user);
 
-            return ApiResponse::success([
-                'itemId' => $item->getId(),
-                'cart' => $cart ? $this->cartService->serializeCart($cart) : null,
-            ]);
-        } catch (\InvalidArgumentException $e) {
-            return ApiResponse::error($e->getMessage(), 404);
+            return ApiResponse::success($this->cartService->serializeCart($cart));
+        } catch (\Throwable $e) {
+            return $this->mapCartAddException($e);
         }
     }
 
     #[Route('/items/{id}', name: 'api_customer_cart_delete_item', methods: ['DELETE'], requirements: ['id' => '\d+'])]
     public function deleteItem(int $id): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
 
         try {
-            $this->cartService->removeItem($this->requireUser(), $id);
-            $cart = $this->cartService->getOrCreateCart($this->requireUser());
+            $cart = $this->cartService->removeItem($this->requireUser(), $id);
 
             return ApiResponse::success($this->cartService->serializeCart($cart));
         } catch (\InvalidArgumentException $e) {
@@ -107,7 +90,7 @@ final class CartController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_cart_clear', methods: ['DELETE'])]
     public function clear(): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        $this->requireCustomerApi();
         $this->cartService->clearCart($this->requireUser());
 
         return ApiResponse::success(['cleared' => true]);

@@ -30,6 +30,21 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
+     * Customer-facing catalog: active and out-of-stock items (excludes inactive/hidden).
+     *
+     * @return Product[]
+     */
+    public function findCatalogProducts(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.status IN (:statuses)')
+            ->setParameter('statuses', [Product::STATUS_ACTIVE, Product::STATUS_OUT_OF_STOCK])
+            ->orderBy('p.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return int Returns the count of products
      */
     public function countProducts(): int

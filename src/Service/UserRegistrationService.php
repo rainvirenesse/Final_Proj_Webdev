@@ -35,7 +35,7 @@ class UserRegistrationService
         }
 
         $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
-        $user->setRoles(['ROLE_USER']);
+        $user->setRoles(['ROLE_CUSTOMER']);
         if (!$user->getStatus()) {
             $user->setStatus(User::STATUS_ACTIVE);
         }

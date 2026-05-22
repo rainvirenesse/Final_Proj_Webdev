@@ -20,7 +20,7 @@ final class ProductController extends AbstractCustomerApiController
     #[Route('', name: 'api_customer_products_list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $products = $this->productRepository->findActiveProducts();
+        $products = $this->productRepository->findCatalogProducts();
         $data = array_map(
             fn ($p) => $this->productSerializer->toArray($p),
             $products
@@ -33,7 +33,7 @@ final class ProductController extends AbstractCustomerApiController
     public function show(int $id): JsonResponse
     {
         $product = $this->productRepository->find($id);
-        if (!$product || $product->getStatus() !== \App\Entity\Product::STATUS_ACTIVE) {
+        if (!$product || $product->getStatus() === \App\Entity\Product::STATUS_INACTIVE) {
             return ApiResponse::error('Product not found.', 404);
         }
 

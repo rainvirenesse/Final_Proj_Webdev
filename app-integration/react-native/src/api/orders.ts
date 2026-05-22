@@ -33,7 +33,7 @@ export async function fetchOrder(token: string, id: number): Promise<Order> {
 
 export async function createOrderFromCart(token: string, notes?: string): Promise<Order> {
   return apiRequest<Order>(
-    '/api/customer/orders',
+    '/api/orders',
     { method: 'POST', body: JSON.stringify({ notes: notes ?? null }) },
     token,
   );

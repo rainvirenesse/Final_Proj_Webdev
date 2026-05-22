@@ -28,4 +28,25 @@ class CartRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findCartIdForUser(User $user): ?int
+    {
+        $id = $this->createQueryBuilder('c')
+            ->select('c.id')
+            ->andWhere('c.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $id !== null ? (int) $id : null;
+    }
+
+    public function touchCartById(int $cartId): void
+    {
+        $this->getEntityManager()
+            ->createQuery('UPDATE App\Entity\Cart c SET c.updatedAt = :now WHERE c.id = :id')
+            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('id', $cartId)
+            ->execute();
+    }
 }
