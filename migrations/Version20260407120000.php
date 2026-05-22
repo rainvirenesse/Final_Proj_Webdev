@@ -16,6 +16,10 @@ final class Version20260407120000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        if (!$schema->hasTable('user') || $schema->getTable('user')->hasColumn('last_activity_at')) {
+            return;
+        }
+
         $this->addSql('ALTER TABLE `user` ADD last_activity_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
     }
 

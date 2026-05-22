@@ -19,8 +19,11 @@ final class Version20260406061729 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE user ADD google_id VARCHAR(255) DEFAULT NULL');
+        if (!$schema->hasTable('user') || $schema->getTable('user')->hasColumn('google_id')) {
+            return;
+        }
+
+        $this->addSql('ALTER TABLE `user` ADD google_id VARCHAR(255) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void

@@ -19,6 +19,10 @@ final class Version20260430052141 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        if (!$schema->hasTable('stock_record') || $schema->getTable('stock_record')->hasColumn('updated_by_id')) {
+            return;
+        }
+
         $this->addSql('ALTER TABLE stock_record ADD updated_by_id INT DEFAULT NULL, ADD updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
         $this->addSql('ALTER TABLE stock_record ADD CONSTRAINT FK_51124D07896DBBDE FOREIGN KEY (updated_by_id) REFERENCES `user` (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX IDX_51124D07896DBBDE ON stock_record (updated_by_id)');

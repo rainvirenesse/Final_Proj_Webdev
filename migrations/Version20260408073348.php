@@ -19,7 +19,10 @@ final class Version20260408073348 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
+        if (!$schema->hasTable('product') || $schema->getTable('product')->hasColumn('stock')) {
+            return;
+        }
+
         $this->addSql('ALTER TABLE product ADD stock INT NOT NULL DEFAULT 0');
     }
 

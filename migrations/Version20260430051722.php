@@ -19,6 +19,10 @@ final class Version20260430051722 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        if (!$schema->hasTable('stock_record') || !$schema->getTable('stock_record')->hasColumn('note')) {
+            return;
+        }
+
         $this->addSql('ALTER TABLE stock_record DROP note');
     }
 

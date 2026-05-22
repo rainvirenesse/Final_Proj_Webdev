@@ -19,8 +19,11 @@ final class Version20260327015241 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE user CHANGE verification_token verification_token VARCHAR(255) DEFAULT NULL');
+        if (!$schema->hasTable('user')) {
+            return;
+        }
+
+        $this->addSql('ALTER TABLE `user` CHANGE verification_token verification_token VARCHAR(255) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
