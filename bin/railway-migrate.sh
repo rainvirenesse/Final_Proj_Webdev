@@ -2,7 +2,7 @@
 # Wait for Railway MySQL and run migrations (retries on cold start).
 set -euo pipefail
 
-MAX_ATTEMPTS="${MIGRATE_MAX_ATTEMPTS:-30}"
+MAX_ATTEMPTS="${MIGRATE_MAX_ATTEMPTS:-15}"
 SLEEP_SECONDS="${MIGRATE_SLEEP_SECONDS:-2}"
 
 attempt=1

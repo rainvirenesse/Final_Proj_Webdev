@@ -96,6 +96,7 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/verify-email, roles: PUBLIC_ACCESS }
+        - { path: ^/health, roles: PUBLIC_ACCESS }
         - { path: ^/LandingPage, roles: PUBLIC_ACCESS }
         - { path: ^/about, roles: PUBLIC_ACCESS }
         - { path: ^/contact, roles: PUBLIC_ACCESS }

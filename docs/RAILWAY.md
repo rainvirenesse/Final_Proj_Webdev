@@ -32,6 +32,8 @@ flowchart LR
 | `DEFAULT_URI` | Same as `APP_URL` |
 | `JWT_PASSPHRASE` | Long random secret (used when generating PEM keys) |
 | `CORS_ALLOW_ORIGIN` | `^https?://.*` (or restrict to your domains) |
+| `MESSENGER_TRANSPORT_DSN` | Optional — defaults to `doctrine://default?queue_name=messages` (uses MySQL) |
+| `MAILER_DSN` | Optional — defaults to `null://null` (email disabled unless you configure Brevo/SMTP) |
 
 ### JWT keys (choose one approach)
 
@@ -67,7 +69,7 @@ Start script runs **migrations**, warms **cache**, ensures upload directories ex
 
 - Generate a **public domain** for the Symfony service (Railway → Settings → Networking).
 - Set `APP_URL` and `DEFAULT_URI` to that `https://…` URL.
-- Health check: `GET /api/products` (public catalog).
+- Health check: `GET /health` (no database). Catalog: `GET /api/products`.
 
 ## 5. Seed data (first deploy)
 

@@ -44,5 +44,6 @@ echo "==> Warming cache"
 php bin/console cache:warmup --env=prod --no-interaction
 
 PORT="${PORT:-8000}"
-echo "==> Starting PHP built-in server on 0.0.0.0:${PORT}"
-exec php -S "0.0.0.0:${PORT}" -t public
+echo "==> Starting PHP built-in server on 0.0.0.0:${PORT} (Symfony router: public/index.php)"
+# Without public/index.php, /api/products and /health return 404 and Railway healthcheck fails.
+exec php -S "0.0.0.0:${PORT}" -t public public/index.php
