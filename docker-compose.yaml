@@ -1,38 +1,59 @@
 services:
-  mysql:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: credo_app
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/app/src
+      - ./templates:/app/templates
+      - ./public:/app/public
+      - ./var:/app/var
+    environment:
+      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?serverVersion=8.0.32&charset=utf8mb4"
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      APP_ENV: dev
+      APP_DEBUG: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - platform-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  db:
     image: mysql:8.0
-    container_name: project_mysql
-    restart: unless-stopped
+    container_name: credo_db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3306:3306"
+      - "3310:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - platform-db-data:/var/lib/mysql
     networks:
-      - project_network
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: project_phpmyadmin
-    restart: unless-stopped
-    environment: 
-      PMA_HOST: mysql
-      PMA_USER: ${PMA_USER}
-      PMA_PASSWORD: ${PMA_PASSWORD}
- 
-    ports:
-      - "8080:80"
-    depends_on:
-      - mysql
-    networks:
-      - project_network
+      - platform-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 volumes:
-  mysql_data:
+  platform-db-data:
 
 networks:
-  project_network:
+  platform-network:
+    driver: bridge
