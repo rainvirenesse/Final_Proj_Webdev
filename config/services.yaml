@@ -25,10 +25,6 @@ parameters:
     env(GOOGLE_OAUTH_REDIRECT_URI): 'http://localhost'
     app.url: '%env(APP_URL)%'
 
-    App\Controller\LandingPageController:
-        bind:
-            $contactFormEmbedUrl: '%env(default:contact_form_embed_default:CONTACT_FORM_EMBED_URL)%'
-
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -39,6 +35,10 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    App\Controller\LandingPageController:
+        bind:
+            $contactFormEmbedUrl: '%env(default:contact_form_embed_default:CONTACT_FORM_EMBED_URL)%'
 
     App\Service\ProductImageStorage:
         arguments:
