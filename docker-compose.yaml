@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: credo_app
     ports:
-      - "8000:80"
+      - "8000:8080"
     volumes:
       - ./src:/app/src
       - ./templates:/app/templates
@@ -18,6 +18,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       APP_ENV: dev
       APP_DEBUG: "1"
+      APP_SECRET: ${APP_SECRET}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE}
     depends_on:
       db:
         condition: service_healthy
