@@ -327,10 +327,10 @@ class LandingPageController extends AbstractController
     private function getTeam(): array
     {
         return [
-            ['name' => 'Rain Virenesse Credo', 'role' => 'Brand & Design Lead', 'image' => 'reen.png', 'bio' => 'Shapes the look, feel, and details that make every pair uniquely RAIN.'],
+            ['name' => 'Rain Virenesse Credo', 'role' => 'Brand & Design Lead', 'image' => 'rain.png', 'bio' => 'Shapes the look, feel, and details that make every pair uniquely RAIN.'],
             ['name' => 'Jeanie Reann', 'role' => 'Product & Fit Specialist', 'image' => 'jini.png', 'bio' => 'Ensures comfort-first construction with a polished, wearable finish.'],
             ['name' => 'Carrie Victoria', 'role' => 'Customer Experience', 'image' => 'kari.png', 'bio' => 'Helps you find the right style with care, clarity, and quick support.'],
-            ['name' => 'Tristan Frank', 'role' => 'Growth & Partnerships', 'image' => 'franc.png', 'bio' => 'Builds collaborations and community initiatives that keep RAIN moving forward.'],
+            ['name' => 'Tristan Frank', 'role' => 'Growth & Partnerships', 'image' => 'frank.png', 'bio' => 'Builds collaborations and community initiatives that keep RAIN moving forward.'],
         ];
     }
 

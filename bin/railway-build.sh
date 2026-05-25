@@ -36,4 +36,11 @@ php bin/console importmap:install --env=prod --no-interaction || true
 php bin/console cache:clear --env=prod --no-warmup --no-interaction
 php bin/console cache:warmup --env=prod --no-interaction
 
+echo "==> Installing Node.js dependencies"
+npm ci --prefer-offline || npm install
+php bin/console asset-map:compile --env=prod --no-interaction
+
+echo "==> Building frontend assets (webpack encore)"
+npm run build
+
 echo "==> Railway build complete"

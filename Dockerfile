@@ -37,6 +37,9 @@ RUN composer install --no-interaction --optimize-autoloader --no-ansi || true
 # Install frontend importmap assets.
 RUN php bin/console importmap:install --no-interaction
 
+# Build frontend assets with webpack encore (compiles rain.css, app.js → public/build/).
+RUN npm install && npm run build
+
 # Warm up Symfony cache for faster performance.
 RUN php bin/console cache:warmup --env=prod --no-debug || true
 
