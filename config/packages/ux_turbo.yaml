@@ -1,4 +1,4 @@
-# Enable stateless CSRF protection for forms and logins/logouts
+# Disable stateless CSRF protection (check_header) because Railway's edge proxy mangles the origin headers
 framework:
     csrf_protection:
-        check_header: true
+        check_header: false

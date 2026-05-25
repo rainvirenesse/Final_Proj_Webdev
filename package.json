@@ -6,7 +6,7 @@
     "dev-server": "encore dev-server",
     "dev": "encore dev",
     "watch": "encore dev --watch",
-    "build": "encore production"
+    "build": "encore production && php bin/console importmap:install --env=prod || true && php bin/console asset-map:compile --env=prod"
   },
   "devDependencies": {
     "@symfony/webpack-encore": "^5.0.0",

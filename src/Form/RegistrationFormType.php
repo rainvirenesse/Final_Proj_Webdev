@@ -24,17 +24,17 @@ class RegistrationFormType extends AbstractType
                     'placeholder' => 'Enter your username'
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Username cannot be blank.']),
-                    new Assert\Length([
-                        'min' => 3,
-                        'max' => 50,
-                        'minMessage' => 'Username must be at least {{ limit }} characters long.',
-                        'maxMessage' => 'Username cannot exceed {{ limit }} characters.'
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^[a-zA-Z0-9_]+$/',
-                        'message' => 'Username can only contain letters, numbers, and underscores.'
-                    ])
+                    new Assert\NotBlank(message: 'Username cannot be blank.'),
+                    new Assert\Length(
+                        min: 3,
+                        max: 50,
+                        minMessage: 'Username must be at least {{ limit }} characters long.',
+                        maxMessage: 'Username cannot exceed {{ limit }} characters.'
+                    ),
+                    new Assert\Regex(
+                        pattern: '/^[a-zA-Z0-9_]+$/',
+                        message: 'Username can only contain letters, numbers, and underscores.'
+                    )
                 ]
             ])
             ->add('email', EmailType::class, [
@@ -44,12 +44,12 @@ class RegistrationFormType extends AbstractType
                     'placeholder' => 'Enter your email'
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Email cannot be blank.']),
-                    new Assert\Email(['message' => 'Please enter a valid email address.']),
-                    new Assert\Length([
-                        'max' => 180,
-                        'maxMessage' => 'Email cannot exceed {{ limit }} characters.'
-                    ])
+                    new Assert\NotBlank(message: 'Email cannot be blank.'),
+                    new Assert\Email(message: 'Please enter a valid email address.'),
+                    new Assert\Length(
+                        max: 180,
+                        maxMessage: 'Email cannot exceed {{ limit }} characters.'
+                    )
                 ]
             ])
             ->add('password', PasswordType::class, [
@@ -61,11 +61,11 @@ class RegistrationFormType extends AbstractType
                     'autocomplete' => 'new-password'
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Password cannot be blank.']),
-                    new Assert\Length([
-                        'min' => 6,
-                        'minMessage' => 'Password must be at least {{ limit }} characters long.'
-                    ])
+                    new Assert\NotBlank(message: 'Password cannot be blank.'),
+                    new Assert\Length(
+                        min: 6,
+                        minMessage: 'Password must be at least {{ limit }} characters long.'
+                    )
                 ]
             ]);
     }
@@ -77,4 +77,3 @@ class RegistrationFormType extends AbstractType
         ]);
     }
 }
-
