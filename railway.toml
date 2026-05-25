@@ -9,7 +9,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "bash bin/railway-start.sh"
+# Use Dockerfile ENTRYPOINT (nginx + php-fpm on $PORT). Do not override with php -S.
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

@@ -59,11 +59,11 @@ Configured in `Dockerfile` + `railway.toml`:
 | Phase | What runs |
 |-------|-----------|
 | Build | `Dockerfile` → `bin/railway-build.sh` (Composer + Symfony cache) |
-| Start | `bin/railway-start.sh` (migrations + PHP server on `$PORT`) |
+| Start | `entrypoint.sh` (migrations + Nginx + PHP-FPM on `$PORT`) |
 
 If a deploy log shows `composer: command not found` with `--ignore-platform-reqs`, Railway used the wrong auto-builder — ensure `Dockerfile` is committed and `railway.toml` sets `builder = "DOCKERFILE"`.
 
-Start script runs **migrations**, warms **cache**, ensures upload directories exist, then serves `public/` on `$PORT`.
+Do **not** set a custom Railway **Start Command** to `php -S` — that conflicts with the Dockerfile (Nginx must listen on `$PORT`). The entrypoint runs migrations, warms cache, then Nginx + PHP-FPM.
 
 ## 4. Networking
 

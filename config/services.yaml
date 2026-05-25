@@ -15,7 +15,19 @@ parameters:
     # Defaults for %env(default:...:VAR)% processors (Railway-safe when VAR is unset).
     messenger_transport_dsn_default: 'doctrine://default?queue_name=messages'
     mailer_dsn_default: 'null://null'
+    google_client_id_default: ''
+    google_client_secret_default: ''
+    google_oauth_redirect_default: 'http://localhost'
+    contact_form_embed_default: ''
+    env(CONTACT_FORM_EMBED_URL): ''
+    env(GOOGLE_CLIENT_ID): ''
+    env(GOOGLE_CLIENT_SECRET): ''
+    env(GOOGLE_OAUTH_REDIRECT_URI): 'http://localhost'
     app.url: '%env(APP_URL)%'
+
+    App\Controller\LandingPageController:
+        bind:
+            $contactFormEmbedUrl: '%env(default:contact_form_embed_default:CONTACT_FORM_EMBED_URL)%'
 
 services:
     # default configuration for services in *this* file

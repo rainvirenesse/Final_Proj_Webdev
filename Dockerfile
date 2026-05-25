@@ -29,11 +29,7 @@ RUN composer install --no-interaction --no-scripts --optimize-autoloader
 # Copy the entire Symfony project into the container.
 COPY . .
 
-# Automatically create a default .env file if missing.
-RUN if [ ! -f /app/.env ]; then \
-    DB_URL=${DATABASE_URL:-${MYSQL_URL:-mysql://root@127.0.0.1:3306/app_db?serverVersion=8.0}}; \
-    echo "APP_ENV=${APP_ENV:-prod}\nAPP_DEBUG=${APP_DEBUG:-false}\nAPP_SECRET=${APP_SECRET:-ChangeMe}\nDEFAULT_URI=${DEFAULT_URI:-http://localhost}\nDATABASE_URL=$DB_URL\nMAILER_DSN=${MAILER_DSN:-null://null}\nMESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}\n" > /app/.env; \
-    fi
+# Do not bake .env with localhost DATABASE_URL — Railway injects variables at runtime.
 
 # Optimize Composer autoload files for production.
 RUN composer install --no-interaction --optimize-autoloader --no-ansi || true
@@ -76,18 +72,18 @@ COPY nginx-main.conf /etc/nginx/nginx.conf
 
 # Remove default nginx site configs and add the Symfony site configuration.
 RUN rm -rf /etc/nginx/conf.d/* /etc/nginx/sites-enabled /etc/nginx/sites-available
-COPY nginx.conf /etc/nginx/conf.d/symfony.conf
+COPY nginx.conf.template /etc/nginx/conf.d/symfony.conf.template
 
 # Configure Nginx for Symfony.
 COPY entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x bin/railway-jwt-keys.sh bin/railway-migrate.sh bin/railway-start.sh
 
-# Healthcheck to verify the application is running.
-HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
+# Healthcheck uses Railway $PORT at runtime (entrypoint writes nginx config first).
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
+    CMD sh -c 'curl -f "http://127.0.0.1:${PORT:-8080}/health" || exit 1'
 
-# Expose port 80 for web access.
-EXPOSE 80
+EXPOSE 8080
 
 # Start the container using the custom entrypoint.
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

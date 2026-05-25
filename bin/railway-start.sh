@@ -9,6 +9,10 @@ export APP_DEBUG="${APP_DEBUG:-0}"
 # Required by Symfony prod container; set in Railway Variables to override.
 export MESSENGER_TRANSPORT_DSN="${MESSENGER_TRANSPORT_DSN:-doctrine://default?queue_name=messages}"
 export MAILER_DSN="${MAILER_DSN:-null://null}"
+export GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID:-}"
+export GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET:-}"
+export GOOGLE_OAUTH_REDIRECT_URI="${GOOGLE_OAUTH_REDIRECT_URI:-http://localhost}"
+export CONTACT_FORM_EMBED_URL="${CONTACT_FORM_EMBED_URL:-}"
 
 if [[ -z "${APP_SECRET:-}" || "${APP_SECRET}" == "change-me-to-a-random-32-char-secret" ]]; then
     echo "ERROR: Set APP_SECRET in Railway service variables." >&2
