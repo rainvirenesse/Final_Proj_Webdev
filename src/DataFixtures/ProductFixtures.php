@@ -14,150 +14,115 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         // Get admin user for createdBy
-        $admin = $manager->getRepository(User::class)->findOneBy(['email' => 'rain@gmail.com']);
+        $admin = $manager->getRepository(User::class)->findOneBy(['email' => 'raincredo91@gmail.com']);
         if (!$admin) {
             return; // UserFixtures must be loaded first
         }
 
         $shoes = [
             [
-                'name' => 'Two-Tone Pointed Stiletto Heels',
-                'description' => 'Elegant pointed heels with satin finish',
-                'price' => 2799.00,
-                'category' => 'Heels',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Classic Deep Wine Pumps',
-                'description' => 'Timeless block-heeled silhouette',
-                'price' => 3199.00,
-                'category' => 'Heels',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Low-Heel Mary Jane Flats',
-                'description' => 'Comfortable low-heel design',
-                'price' => 1899.00,
-                'category' => 'Flats',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Slingback Bow Block Heels',
-                'description' => 'Refined slingback with bow detail',
-                'price' => 2499.00,
-                'category' => 'Heels',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Braided Strap Slip-On Sandals',
-                'description' => 'Woven leather upper, cushioned sole',
-                'price' => 1699.00,
-                'category' => 'Sandals',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Knee-High Square Heel Boots',
-                'description' => 'Luxe suede finish, block heel',
-                'price' => 5299.00,
-                'category' => 'Boots',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Platform Ankle-Strap High Heels',
-                'description' => 'Thick platform with ankle strap',
-                'price' => 3599.00,
-                'category' => 'Heels',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Chain Accent Loafers',
-                'description' => 'Classic loafer with gold chain detail.',
-                'price' => 2899.00,
-                'category' => 'Outdoor',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Feather Trim Mule Heels',
-                'description' => 'Fluffy feather trim with sleek block heel.',
-                'price' => 3299.00,
-                'category' => 'Heels',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Wrap-Around Lace Heels',
-                'description' => 'Delicate lace-up wrap with stiletto heel.',
-                'price' => 2999.00,
-                'category' => 'Heels',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Pointed Cap-Toe Flats',
-                'description' => 'Two-tone cap toe with slim pointed silhouette.',
-                'price' => 2199.00,
-                'category' => 'Flats',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Buckle Strap Platform Boots',
-                'description' => 'Bold platform sole with multi-buckle straps.',
-                'price' => 5499.00,
-                'category' => 'Boots',
-                'status' => Product::STATUS_ACTIVE,
-            ],
-            [
-                'name' => 'Square-Toe Satin Mules',
-                'description' => 'Soft satin finish with cushioned insole.',
-                'price' => 2199.00,
+                'name' => 'Luxury Leather Oxford',
+                'description' => 'Handcrafted premium leather oxford shoes with classic brogue detailing. Perfect for formal occasions and business wear.',
+                'price' => 450.00,
                 'category' => 'Formal',
                 'status' => Product::STATUS_ACTIVE,
             ],
             [
-                'name' => 'Minimalist Leather Slides',
-                'description' => 'Clean lines and all-day comfort footbed.',
-                'price' => 1799.00,
-                'category' => 'Slippers',
+                'name' => 'Designer Sneaker Pro',
+                'description' => 'High-end athletic sneakers with premium materials and advanced cushioning technology. Ideal for active lifestyle.',
+                'price' => 320.00,
+                'category' => 'Casual',
                 'status' => Product::STATUS_ACTIVE,
             ],
             [
-                'name' => 'Lace-Up Chunky Sneakers',
-                'description' => 'Street-ready profile with lightweight sole.',
-                'price' => 2999.00,
-                'category' => 'Sneakers',
+                'name' => 'Italian Loafers',
+                'description' => 'Elegant Italian-made loafers with genuine leather and sophisticated design. Comfortable slip-on style.',
+                'price' => 380.00,
+                'category' => 'Casual',
                 'status' => Product::STATUS_ACTIVE,
             ],
-             [
-                'name' => 'Classic Penny Loafers',
-                'description' => 'Polished leather upper and flexible base.',
-                'price' => 2699.00,
+            [
+                'name' => 'Executive Derby Shoes',
+                'description' => 'Professional derby shoes with polished finish and premium leather construction. Business formal essential.',
+                'price' => 420.00,
                 'category' => 'Formal',
                 'status' => Product::STATUS_ACTIVE,
             ],
-             [
-                'name' => 'Open-Toe Block Sandals',
-                'description' => 'Balanced heel height for everyday wear.',
-                'price' => 2099.00,
-                'category' => 'Sandals',
+            [
+                'name' => 'Sport Running Elite',
+                'description' => 'Professional-grade running shoes with breathable mesh and responsive sole technology. Perfect for athletes.',
+                'price' => 280.00,
+                'category' => 'Sports',
                 'status' => Product::STATUS_ACTIVE,
             ],
-             [
-                'name' => 'Knit Slip-On Trainers',
-                'description' => 'Breathable upper with responsive cushioning.',
-                'price' => 2399.00,
+            [
+                'name' => 'Classic Monk Strap',
+                'description' => 'Timeless monk strap shoes with double buckle closure and premium calfskin leather. Sophisticated style statement.',
+                'price' => 495.00,
+                'category' => 'Formal',
+                'status' => Product::STATUS_ACTIVE,
+            ],
+            [
+                'name' => 'Casual Canvas Sneakers',
+                'description' => 'Comfortable canvas sneakers with rubber sole and modern design. Perfect for everyday casual wear.',
+                'price' => 120.00,
+                'category' => 'Casual',
+                'status' => Product::STATUS_ACTIVE,
+            ],
+            [
+                'name' => 'Premium Boots Collection',
+                'description' => 'Durable leather boots with weather-resistant finish and comfortable inner lining. Ideal for outdoor activities.',
+                'price' => 550.00,
                 'category' => 'Outdoor',
                 'status' => Product::STATUS_ACTIVE,
             ],
-             [
-                'name' => 'Everyday Ballet Flats',
-                'description' => 'Soft lining and flexible comfort sole.',
-                'price' => 1599.00,
-                'category' => 'Flats',
+            [
+                'name' => 'Designer Moccasins',
+                'description' => 'Soft suede moccasins with hand-stitched detailing and cushioned insole. Ultimate comfort and style.',
+                'price' => 195.00,
+                'category' => 'Casual',
                 'status' => Product::STATUS_ACTIVE,
             ],
-             [
-                'name' => 'Signature Ankle Boots',
-                'description' => 'Structured upper with side-zip entry.',
-                'price' => 4499.00,
-                'category' => 'Boots',
+            [
+                'name' => 'Limited Edition Wingtips',
+                'description' => 'Exclusive wingtip brogues with intricate perforated patterns and premium Italian leather. Collector\'s item.',
+                'price' => 650.00,
+                'category' => 'Formal',
+                'status' => Product::STATUS_ACTIVE,
+            ],
+            [
+                'name' => 'Athletic Training Shoes',
+                'description' => 'Multi-purpose training shoes with stability support and flexible sole. Perfect for gym and cross-training.',
+                'price' => 250.00,
+                'category' => 'Sports',
+                'status' => Product::STATUS_ACTIVE,
+            ],
+            [
+                'name' => 'Business Casual Slip-Ons',
+                'description' => 'Versatile slip-on shoes that bridge formal and casual. Premium materials with modern design.',
+                'price' => 275.00,
+                'category' => 'Casual',
+                'status' => Product::STATUS_ACTIVE,
+            ],
+            [
+                'name' => 'Heritage Brogues',
+                'description' => 'Classic brogue shoes with traditional craftsmanship and premium full-grain leather. Timeless elegance.',
+                'price' => 475.00,
+                'category' => 'Formal',
+                'status' => Product::STATUS_ACTIVE,
+            ],
+            [
+                'name' => 'Minimalist Walking Shoes',
+                'description' => 'Lightweight walking shoes with minimalist design and maximum comfort. Perfect for long walks.',
+                'price' => 180.00,
+                'category' => 'Casual',
+                'status' => Product::STATUS_ACTIVE,
+            ],
+            [
+                'name' => 'Luxury Evening Shoes',
+                'description' => 'Elegant patent leather shoes perfect for formal evening events and special occasions.',
+                'price' => 520.00,
+                'category' => 'Formal',
                 'status' => Product::STATUS_ACTIVE,
             ],
         ];
@@ -198,4 +163,3 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
         ];
     }
 }
-

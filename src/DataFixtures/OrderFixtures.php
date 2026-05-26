@@ -15,7 +15,11 @@ class OrderFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         // Get customers
-        $customers = $manager->getRepository(User::class)->findBy(['roles' => ['ROLE_USER']]);
+        $admin = $manager->getRepository(User::class)->findOneBy(['email' => 'raincredo91@gmail.com']);
+        $allUsers = $manager->getRepository(User::class)->findAll();
+        $customers = array_values(array_filter($allUsers, function(User $u) {
+            return in_array('ROLE_CUSTOMER', $u->getRoles());
+        }));
         if (empty($customers)) {
             return; // CustomerFixtures must be loaded first
         }
@@ -208,4 +212,3 @@ class OrderFixtures extends Fixture implements DependentFixtureInterface
         ];
     }
 }
-
