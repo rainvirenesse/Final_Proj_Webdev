@@ -164,8 +164,8 @@ class OrderFixtures extends Fixture implements DependentFixtureInterface
             $order = new CustomerOrder();
             $order->setClient($orderData['customer']);
             $order->setOrderNumber($orderData['orderNumber']);
-            $order->setStatus($orderData['status']);
             $order->setPaymentStatus($orderData['paymentStatus']);
+            $order->setStatus($orderData['status']);
             $order->setOrderedAt($orderData['orderedAt']);
             $order->setCompletedAt($orderData['completedAt']);
             $order->setNotes($orderData['notes']);
