@@ -69,7 +69,8 @@ class GoogleAuthController extends AbstractController
         $aud = (string) ($payload['aud'] ?? '');
         $allowedAudiences = array_filter([$googleWebClientId, $googleAndroidClientId]);
         if ($aud === '' || !\in_array($aud, $allowedAudiences, true)) {
-            return $this->json(['message' => 'Invalid token audience'], 401);
+            return $this->json(['message' => 'Invalid token audience', 'debug_aud' => $aud,                          
+        'debug_allowed' => $allowedAudiences,], 401);
         }
 
         $email = $payload['email'] ?? null;
