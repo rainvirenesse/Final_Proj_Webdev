@@ -6,6 +6,7 @@ use App\Entity\CustomerOrder;
 use App\Entity\Payment;
 use App\Entity\User;
 use App\Repository\PaymentRepository;
+use App\Service\Realtime\WebSocketBroadcastService;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class CustomerPaymentService
@@ -14,6 +15,7 @@ final class CustomerPaymentService
         private readonly EntityManagerInterface $em,
         private readonly CustomerOrderApiService $orderApiService,
         private readonly PaymentRepository $paymentRepository,
+        private readonly WebSocketBroadcastService $realtime,
     ) {
     }
 
@@ -77,6 +79,10 @@ final class CustomerPaymentService
 
         $this->em->persist($payment);
         $this->em->flush();
+
+        // Ensure staff dashboards get an immediate payment event, even if doctrine listeners
+        // are disabled/misconfigured in a given environment.
+        $this->realtime->publishPaymentCompleted($order, $payment);
 
         return $this->serializePayment($order, $payment);
     }

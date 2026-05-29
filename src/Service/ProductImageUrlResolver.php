@@ -29,10 +29,11 @@ final class ProductImageUrlResolver
         $stored = trim($stored);
 
         if (str_starts_with($stored, 'http://') || str_starts_with($stored, 'https://')) {
-            return $stored;
+            return preg_replace('#^(https?://[^/]+)/public/#i', '$1/', $stored) ?? $stored;
         }
 
         $stored = ltrim($stored, '/');
+        $stored = preg_replace('#^public/#i', '', $stored) ?? $stored;
 
         if (
             str_starts_with($stored, 'images/')

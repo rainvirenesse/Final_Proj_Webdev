@@ -491,7 +491,7 @@
         }
     </style>
 </head>
-<body>
+<body data-route="{{ app.request.attributes.get('_route') }}">
     <!-- Sidebar Overlay (Mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -641,6 +641,34 @@
                     <span class="navbar-brand-mobile">Designer Shoes Admin</span>
                 </div>
                 <div class="user-info w-100 w-md-auto justify-content-end">
+                    {% if is_granted('ROLE_STAFF') %}
+                        <div class="dropdown" id="realtime-bell">
+                            <button
+                                class="btn btn-sm btn-outline-secondary position-relative"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                aria-label="Notifications"
+                                title="Notifications"
+                            >
+                                <i class="bi bi-bell"></i>
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                                    id="realtime-bell-badge"
+                                >0</span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end p-0 shadow" style="min-width: 320px; max-width: 420px;">
+                                <div id="realtime-bell-status" class="small px-3 py-1 border-bottom text-muted">Connecting…</div>
+                                <div class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                                    <strong>Notifications</strong>
+                                    <button class="btn btn-sm btn-link text-decoration-none" type="button" id="realtime-bell-clear">Clear</button>
+                                </div>
+                                <div id="realtime-bell-list" class="list-group list-group-flush" style="max-height: 360px; overflow: auto;">
+                                    <div class="list-group-item text-muted small">Waiting for live events…</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                     {% if app.user %}
                         <div class="user-avatar">
                             {{ app.user.email|first|upper }}
@@ -731,6 +759,13 @@
         });
 
     </script>
+
+    {% if is_granted('ROLE_STAFF') %}
+    {% set realtime_js_v = '2026052911' %}
+    <script src="{{ asset('js/realtime-bell.js') ~ '?v=' ~ realtime_js_v }}" defer></script>
+    <script src="{{ asset('js/realtime-notifications.js') ~ '?v=' ~ realtime_js_v }}" defer></script>
+    <script src="{{ asset('js/realtime-dashboard-sync.js') ~ '?v=' ~ realtime_js_v }}" defer></script>
+    {% endif %}
 
     {% block scripts %}{% endblock %}
 </body>

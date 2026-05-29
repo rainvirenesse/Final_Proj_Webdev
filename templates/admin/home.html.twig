@@ -18,7 +18,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <p class="text-muted mb-1">Total Users</p>
-                    <h3 class="fw-bold">{{ totalUsers }}</h3>
+                    <h3 class="fw-bold" id="stat-total-users">{{ totalUsers }}</h3>
                     <small class="text-muted">Registered users</small>
                 </div>
             </div>
@@ -27,7 +27,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <p class="text-muted mb-1">Total Staff</p>
-                    <h3 class="fw-bold">{{ totalStaff }}</h3>
+                    <h3 class="fw-bold" id="stat-total-staff">{{ totalStaff }}</h3>
                     <small class="text-muted">Staff & Admin accounts</small>
                 </div>
             </div>
@@ -36,7 +36,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <p class="text-muted mb-1">Active Orders</p>
-                    <h3 class="fw-bold">{{ activeOrders }}</h3>
+                    <h3 class="fw-bold" id="stat-active-orders">{{ activeOrders }}</h3>
                     <small class="text-muted">In progress or pending</small>
                 </div>
             </div>
@@ -46,7 +46,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <p class="text-muted mb-1">Completed Orders</p>
-                    <h3 class="fw-bold">{{ completedOrders }}</h3>
+                    <h3 class="fw-bold" id="stat-completed-orders">{{ completedOrders }}</h3>
                     <small class="text-muted">All time</small>
                 </div>
             </div>
@@ -59,9 +59,9 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <p class="text-muted mb-1">Total Products</p>
-                    <h3 class="fw-bold">{{ totalProducts }}</h3>
-                    <small class="text-success">{{ activeProducts }} active</small><br>
-                    <small class="text-muted">{{ totalProductStock }} total stock</small>
+                    <h3 class="fw-bold" id="stat-total-products">{{ totalProducts }}</h3>
+                    <small class="text-success"><span id="stat-active-products">{{ activeProducts }}</span> active</small><br>
+                    <small class="text-muted"><span id="stat-total-stock">{{ totalProductStock }}</span> total stock</small>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <p class="text-muted mb-1">Total Services</p>
-                    <h3 class="fw-bold">{{ totalServices }}</h3>
+                    <h3 class="fw-bold" id="stat-total-services">{{ totalServices }}</h3>
                     <small class="text-muted">Available services</small>
                 </div>
             </div>
@@ -78,7 +78,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <p class="text-muted mb-1">Total Orders</p>
-                    <h3 class="fw-bold">{{ totalOrders }}</h3>
+                    <h3 class="fw-bold" id="stat-total-orders">{{ totalOrders }}</h3>
                     <small class="text-muted">All orders</small>
                 </div>
             </div>

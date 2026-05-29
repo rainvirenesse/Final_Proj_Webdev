@@ -11,7 +11,7 @@ flowchart LR
     API -->|static files| Images[public/images/products]
 ```
 
-- **Real-time sync**: The mobile app reads/writes via the REST API (`GET /api/products`, cart, orders). There is no WebSocket layer; the database is the source of truth on each request.
+- **Real-time sync**: Symfony now broadcasts live events through a dedicated WebSocket hub service (`realtime-ws`) for dashboard and mobile notifications.
 - **Product images**: Served from `public/images/products/` at `/images/products/{filename}`. `imageUrl` in JSON uses `APP_URL`.
 
 ## 1. Create Railway project
@@ -34,6 +34,9 @@ flowchart LR
 | `CORS_ALLOW_ORIGIN` | `^https?://.*` (or restrict to your domains) |
 | `MESSENGER_TRANSPORT_DSN` | Optional — defaults to `doctrine://default?queue_name=messages` (uses MySQL) |
 | `MAILER_DSN` | Optional — defaults to `null://null` (email disabled unless you configure Brevo/SMTP) |
+| `REALTIME_WS_BROADCAST_URL` | Internal broadcast endpoint used by Symfony, e.g. `http://realtime-ws:8090/broadcast` |
+| `REALTIME_WS_BROADCAST_KEY` | Shared secret between Symfony and the WebSocket hub |
+| `REALTIME_WS_PUBLIC_URL` | Public/client WebSocket URL, e.g. `wss://your-ws-service.up.railway.app` |
 
 ### JWT keys (choose one approach)
 
@@ -64,6 +67,18 @@ Configured in `Dockerfile` + `railway.toml`:
 If a deploy log shows `composer: command not found` with `--ignore-platform-reqs`, Railway used the wrong auto-builder — ensure `Dockerfile` is committed and `railway.toml` sets `builder = "DOCKERFILE"`.
 
 Do **not** set a custom Railway **Start Command** to `php -S` — that conflicts with the Dockerfile (Nginx must listen on `$PORT`). The entrypoint runs migrations, warms cache, then Nginx + PHP-FPM.
+
+## 3.1 Realtime WebSocket service (second Railway service)
+
+Deploy `realtime-ws/` as a separate Node.js Railway service:
+
+1. Add a new Railway service from the same repo, root directory `realtime-ws/`.
+2. Set `REALTIME_WS_BROADCAST_KEY` on both services (same exact value).
+3. Set WebSocket service `PORT` to Railway `$PORT` (Railway injects this automatically).
+4. In Symfony service variables:
+   - `REALTIME_WS_BROADCAST_URL=http://<realtime-private-host>/broadcast`
+   - `REALTIME_WS_PUBLIC_URL=wss://<realtime-public-domain>`
+5. Redeploy both services.
 
 ## 4. Networking
 

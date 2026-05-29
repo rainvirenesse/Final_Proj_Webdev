@@ -26,6 +26,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'price' => 450.00,
                 'category' => 'Formal',
                 'status' => Product::STATUS_ACTIVE,
+                'image' => 'stelitto.png',
             ],
             [
                 'name' => 'Designer Sneaker Pro',

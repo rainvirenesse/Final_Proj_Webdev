@@ -1,0 +1,14 @@
+parameters:
+    env(REALTIME_WS_BROADCAST_URL): 'http://127.0.0.1:8090/broadcast'
+    env(REALTIME_WS_BROADCAST_KEY): 'credo-dev-broadcast-key'
+    env(REALTIME_WS_PUBLIC_URL): 'ws://127.0.0.1:8090'
+
+services:
+    App\Service\Realtime\WebSocketBroadcastService:
+        arguments:
+            $broadcastUrl: '%env(REALTIME_WS_BROADCAST_URL)%'
+            $broadcastKey: '%env(REALTIME_WS_BROADCAST_KEY)%'
+
+    App\Service\Realtime\RealtimeSubscribeTokenService:
+        arguments:
+            $broadcastKey: '%env(REALTIME_WS_BROADCAST_KEY)%'

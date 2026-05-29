@@ -7,7 +7,8 @@ knpu_oauth2_client:
             type: google
             client_id: '%env(default:google_client_id_default:GOOGLE_CLIENT_ID)%'
             client_secret: '%env(default:google_client_secret_default:GOOGLE_CLIENT_SECRET)%'
-            redirect_route: '%env(default:google_oauth_redirect_default:GOOGLE_OAUTH_REDIRECT_URI)%'
+            # Must be the Symfony route name that receives Google's callback.
+            redirect_route: google_auth_callback
             redirect_params: {}
 
             # configure your clients as described here: https://github.com/knpuniversity/oauth2-client-bundle#configuration

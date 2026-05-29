@@ -35,7 +35,7 @@ class CustomerOrder
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'customerOrders')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "Client must be selected.")]
     private ?User $client = null;
@@ -104,6 +104,10 @@ class CustomerOrder
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $createdBy = null;
+
+    /** Set when staff taps Approve on the dashboard (distinct from payment → IN_PROGRESS). */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $staffApprovedAt = null;
 
     // Track original status for validation
     private ?string $originalStatus = null;
@@ -372,5 +376,22 @@ class CustomerOrder
     {
         $this->createdBy = $createdBy;
         return $this;
+    }
+
+    public function getStaffApprovedAt(): ?\DateTimeImmutable
+    {
+        return $this->staffApprovedAt;
+    }
+
+    public function setStaffApprovedAt(?\DateTimeImmutable $staffApprovedAt): self
+    {
+        $this->staffApprovedAt = $staffApprovedAt;
+
+        return $this;
+    }
+
+    public function isStaffApproved(): bool
+    {
+        return $this->staffApprovedAt !== null;
     }
 }

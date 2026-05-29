@@ -26,7 +26,7 @@ class OrderItem
     private ?CustomerOrder $order = null;
 
     // Many OrderItems belong to one Service (nullable - can be product or service)
-    #[ORM\ManyToOne(targetEntity: Service::class)]
+    #[ORM\ManyToOne(targetEntity: Service::class, inversedBy: 'orderItems')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Service $service = null;
 

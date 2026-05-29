@@ -1,0 +1,101 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: credo_app
+    ports:
+      - "8000:8080"
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./templates:/app/templates
+      - ./public:/app/public
+      - ./var:/app/var
+    environment:
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-app}@${MYSQL_HOST:-db}:${MYSQL_PORT:-3306}/${MYSQL_DATABASE:-rain_db}?serverVersion=8.0.32&charset=utf8mb4"
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-app}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-rain_db}
+      MYSQL_HOST: ${MYSQL_HOST:-db}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_ANDROID_CLIENT_ID: ${GOOGLE_ANDROID_CLIENT_ID:-}
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET:-dev-app-secret-change-me}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-dev-jwt-passphrase-change-me}
+      REALTIME_WS_BROADCAST_URL: "http://realtime-ws:8090/broadcast"
+      REALTIME_WS_BROADCAST_KEY: ${REALTIME_WS_BROADCAST_KEY:-credo-dev-broadcast-key}
+      REALTIME_WS_PUBLIC_URL: "ws://localhost:8091"
+    depends_on:
+      db:
+        condition: service_healthy
+      realtime-ws:
+        condition: service_started
+    networks:
+      - platform-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  db:
+    image: mysql:8.0
+    container_name: credo_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-rain_db}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-app}
+    ports:
+      - "3310:3306"
+    volumes:
+      - platform-db-data:/var/lib/mysql
+    networks:
+      - platform-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: credo_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${MYSQL_USER:-app}
+      PMA_PASSWORD: ${MYSQL_PASSWORD:-app}
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - platform-network
+
+  realtime-ws:
+    image: node:22-alpine
+    container_name: credo_realtime_ws
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    volumes:
+      - ./realtime-ws:/app
+    ports:
+      - "8091:8090"
+    environment:
+      PORT: "8090"
+      REALTIME_WS_BROADCAST_KEY: ${REALTIME_WS_BROADCAST_KEY:-credo-dev-broadcast-key}
+    networks:
+      - platform-network
+
+volumes:
+  platform-db-data:
+
+networks:
+  platform-network:
+    driver: bridge

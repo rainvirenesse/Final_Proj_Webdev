@@ -111,6 +111,7 @@ security:
         - { path: ^/admin/stock, roles: ROLE_STAFF }
         - { path: ^/admin/orders, roles: ROLE_STAFF }
         - { path: ^/admin/services, roles: ROLE_STAFF }
+        - { path: ^/realtime, roles: ROLE_STAFF }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/staff, roles: ROLE_STAFF }
         - { path: ^/user, roles: ROLE_USER }

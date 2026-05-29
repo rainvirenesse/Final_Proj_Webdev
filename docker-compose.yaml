@@ -1,40 +1,8 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: credo_app
-    ports:
-      - "8000:8080"
-    volumes:
-      - ./src:/app/src
-      - ./templates:/app/templates
-      - ./public:/app/public
-      - ./var:/app/var
-    environment:
-      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?serverVersion=8.0.32&charset=utf8mb4"
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      APP_ENV: dev
-      APP_DEBUG: "1"
-      APP_SECRET: ${APP_SECRET}
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - platform-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-
-  db:
+  mysql:
     image: mysql:8.0
-    container_name: credo_db
+    container_name: project_mysql
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -43,19 +11,76 @@ services:
     ports:
       - "3310:3306"
     volumes:
-      - platform-db-data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     networks:
-      - platform-network
+      - project_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: project_phpmyadmin
+    restart: unless-stopped
+    environment: 
+      PMA_HOST: mysql
+      PMA_USER: ${PMA_USER}
+      PMA_PASSWORD: ${PMA_PASSWORD}
+ 
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - project_network
+
+  realtime-ws:
+    image: node:22-alpine
+    container_name: project_realtime_ws
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    volumes:
+      - ./realtime-ws:/app
+    ports:
+      - "8091:8090"
+    environment:
+      PORT: "8090"
+      REALTIME_WS_BROADCAST_KEY: ${REALTIME_WS_BROADCAST_KEY:-credo-dev-broadcast-key}
+    networks:
+      - project_network
+
+###> symfony/mercure-bundle ###
+  mercure:
+    image: dunglas/mercure
+    container_name: project_mercure
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ':80'
+      MERCURE_PUBLISHER_JWT_KEY: '${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}'
+      MERCURE_SUBSCRIBER_JWT_KEY: '${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}'
+      # Browser EventSource (React localhost:3000) + Symfony admin/API origins
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins *
+        anonymous
+    command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
+    ports:
+      - "9090:80"
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
       timeout: 5s
       retries: 5
-      start_period: 15s
+      start_period: 60s
+    volumes:
+      - mercure_data:/data
+      - mercure_config:/config
+    networks:
+      - project_network
+###< symfony/mercure-bundle ###
 
 volumes:
-  platform-db-data:
+
+###> symfony/mercure-bundle ###
+  mercure_data:
+  mercure_config:
+###< symfony/mercure-bundle ###
+  mysql_data:
 
 networks:
-  platform-network:
-    driver: bridge
+  project_network:

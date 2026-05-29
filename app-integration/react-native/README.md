@@ -31,7 +31,7 @@ APP_URL=http://192.168.1.25:8000
 
 Use the dedicated customer REST API under `/api/customer/*` (see `docs/API_CUSTOMER.md` in the Symfony project).
 
-Copy `src/api/client.ts`, `auth.ts`, `cart.ts`, `orders.ts`, `profile.ts`, `payments.ts`, and updated `products.ts`.
+Copy `src/api/client.ts`, `auth.ts`, `cart.ts`, `orders.ts`, `profile.ts`, `payments.ts`, updated `products.ts`, plus realtime files `realtime.ts` and `hooks/useRealtimeNotifications.ts`.
 
 **Login token:** After `POST /api/login`, store `parseLoginToken(response)` (see `auth.ts`) and pass it to every cart/order call. If you skip the token, add-to-cart returns **401** and many apps show “session expired”.
 
@@ -85,3 +85,33 @@ export default function ProductsScreen() {
 2. Open `http://YOUR_HOST:8000/api/products` in a browser — confirm `imageUrl` is present.
 3. Open the same URL in the phone browser — image URL must load.
 4. Run the mobile app with matching `EXPO_PUBLIC_API_URL`.
+
+## 6. Realtime notifications (orders/payments/stock/activity)
+
+The backend exposes:
+
+- `GET /api/customer/realtime/config`
+- `GET /api/customer/realtime/token`
+
+Use the hook:
+
+```tsx
+import { useMemo } from 'react';
+import { Text, View } from 'react-native';
+import { useRealtimeNotifications } from './src/hooks/useRealtimeNotifications';
+
+export function NotificationsPanel({ token }: { token: string | null }) {
+  const getJwt = useMemo(() => () => token, [token]);
+  const { notifications } = useRealtimeNotifications(getJwt, { enabled: !!token });
+
+  return (
+    <View>
+      {notifications.slice(0, 5).map((n) => (
+        <Text key={n.id}>{`${n.title}: ${n.body}`}</Text>
+      ))}
+    </View>
+  );
+}
+```
+
+Events are pushed instantly after order creation/status changes, successful payments, stock updates, and activity logging.

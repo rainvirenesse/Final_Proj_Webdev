@@ -9,7 +9,9 @@ use App\Entity\User;
 use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\CustomerOrderRepository;
+use App\Service\Mercure\MercureOrderPublisher;
 use App\Service\OrderNumberGenerator;
+use App\Service\Realtime\WebSocketBroadcastService;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class CustomerOrderApiService
@@ -20,6 +22,8 @@ final class CustomerOrderApiService
         private readonly CartRepository $cartRepository,
         private readonly CartItemRepository $cartItemRepository,
         private readonly OrderNumberGenerator $orderNumberGenerator,
+        private readonly MercureOrderPublisher $mercure,
+        private readonly WebSocketBroadcastService $realtime,
     ) {
     }
 
@@ -103,9 +107,18 @@ final class CustomerOrderApiService
         $this->em->persist($order);
         $this->em->flush();
 
+        $this->mercure->publishOrderCreated($order);
+        $this->realtime->publishOrderCreated($order);
+
         if ($cartId !== null) {
             $this->cartItemRepository->deleteAllForCartId($cartId);
             $this->cartRepository->touchCartById($cartId);
+        }
+
+        $userId = $user->getId();
+        if ($userId !== null) {
+            $this->realtime->publishCartUpdated($userId);
+            $this->realtime->publishOrdersUpdated($userId);
         }
 
         return $order;
@@ -187,6 +200,7 @@ final class CustomerOrderApiService
         if ($detailed) {
             $data['notes'] = $order->getNotes();
             $data['completedAt'] = $order->getCompletedAt()?->format(\DateTimeInterface::ATOM);
+            $data['staffApprovedAt'] = $order->getStaffApprovedAt()?->format(\DateTimeInterface::ATOM);
             $data['items'] = $items;
         }
 

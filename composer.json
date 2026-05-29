@@ -11,7 +11,6 @@
         "api-platform/symfony": "^4.2",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.18",
-        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.5",
         "knpuniversity/oauth2-client-bundle": "^2.20",
@@ -33,6 +32,8 @@
         "symfony/http-client": "7.3.*",
         "symfony/intl": "7.3.*",
         "symfony/mailer": "7.3.*",
+        "symfony/mercure": "^0.7.2",
+        "symfony/mercure-bundle": "*",
         "symfony/mime": "7.3.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/notifier": "7.3.*",
@@ -106,6 +107,7 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
         "symfony/debug-bundle": "7.3.*",

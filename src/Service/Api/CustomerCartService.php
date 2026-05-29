@@ -10,6 +10,7 @@ use App\Exception\ProductOutOfStockException;
 use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\ProductRepository;
+use App\Service\Realtime\WebSocketBroadcastService;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -24,6 +25,7 @@ final class CustomerCartService
         private readonly CartItemRepository $cartItemRepository,
         private readonly ProductRepository $productRepository,
         private readonly ProductSerializer $productSerializer,
+        private readonly WebSocketBroadcastService $realtime,
     ) {
     }
 
@@ -100,6 +102,7 @@ final class CustomerCartService
             $existing->setQuantity($newQty);
             $cart->touch();
             $this->em->flush();
+            $this->realtime->publishCartUpdated($user->getId() ?? 0);
 
             return $existing;
         }
@@ -113,6 +116,7 @@ final class CustomerCartService
         $cart->touch();
         $this->em->persist($item);
         $this->em->flush();
+        $this->realtime->publishCartUpdated($user->getId() ?? 0);
 
         return $item;
     }
@@ -134,6 +138,7 @@ final class CustomerCartService
         $item->setQuantity($quantity);
         $item->getCart()?->touch();
         $this->em->flush();
+        $this->realtime->publishCartUpdated($user->getId() ?? 0);
 
         return $item;
     }
@@ -149,6 +154,7 @@ final class CustomerCartService
         $this->em->remove($item);
         $cart->touch();
         $this->em->flush();
+        $this->realtime->publishCartUpdated($user->getId() ?? 0);
 
         $reloaded = $this->cartRepository->findOneByUser($user);
 
@@ -164,6 +170,7 @@ final class CustomerCartService
 
         $this->cartItemRepository->deleteAllForCartId($cartId);
         $this->cartRepository->touchCartById($cartId);
+        $this->realtime->publishCartUpdated($user->getId() ?? 0);
     }
 
     /**
