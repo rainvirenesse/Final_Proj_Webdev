@@ -41,10 +41,10 @@ class GoogleAuthController extends AbstractController
         EntityManagerInterface $em,
         JWTTokenManagerInterface $jwtManager,
         UserPasswordHasherInterface $passwordHasher,
-        #[Autowire('%env(default:google_client_id_default:GOOGLE_CLIENT_ID)%')]
-        string $googleWebClientId,
-        #[Autowire('%env(default:google_android_client_id_default:GOOGLE_ANDROID_CLIENT_ID)%')]
-        ?string $googleAndroidClientId = null,
+        #[Autowire('%env(default:google_mobile_web_client_id_default:GOOGLE_MOBILE_WEB_CLIENT_ID)%')]
+        string $googleMobileWebClientId,
+        #[Autowire('%env(default:google_mobile_android_client_id_default:GOOGLE_MOBILE_ANDROID_CLIENT_ID)%')]
+        string $googleMobileAndroidClientId,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $idToken = $data['idToken'] ?? null;
@@ -67,10 +67,15 @@ class GoogleAuthController extends AbstractController
         }
 
         $aud = (string) ($payload['aud'] ?? '');
-        $allowedAudiences = array_filter([$googleWebClientId, $googleAndroidClientId]);
-        if ($aud === '' || !\in_array($aud, $allowedAudiences, true)) {
-            return $this->json(['message' => 'Invalid token audience', 'debug_aud' => $aud,                          
-        'debug_allowed' => $allowedAudiences,], 401);
+        $azp = (string) ($payload['azp'] ?? '');
+        $allowedAudiences = array_values(array_unique(array_filter([
+            $googleMobileWebClientId,
+            $googleMobileAndroidClientId,
+        ])));
+        $audienceOk = ($aud !== '' && \in_array($aud, $allowedAudiences, true))
+            || ($azp !== '' && \in_array($azp, $allowedAudiences, true));
+        if (!$audienceOk) {
+            return $this->json(['message' => 'Invalid token audience'], 401);
         }
 
         $email = $payload['email'] ?? null;
