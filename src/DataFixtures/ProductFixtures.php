@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Product;
 use App\Entity\StockRecord;
 use App\Entity\User;
+use App\Service\ShopCatalog;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -19,6 +20,8 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
             return; // UserFixtures must be loaded first
         }
 
+        $imageByName = (new ShopCatalog())->getProductImageMap();
+
         $shoes = [
             [
                 'name' => 'Two-Tone Pointed Stiletto Heels',
@@ -26,7 +29,6 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'price' => 2799.00,
                 'category' => 'Formal',
                 'status' => Product::STATUS_ACTIVE,
-                'image' => 'stelitto.png',
             ],
             [
                 'name' => 'Classic Deep Wine Pumps',
@@ -176,6 +178,11 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
             $product->setStock($stockQty);
             $product->setCreatedBy($admin);
             // createdAt and updatedAt are set automatically via lifecycle callbacks
+
+            $image = $shoeData['image'] ?? $imageByName[$shoeData['name']] ?? null;
+            if ($image !== null) {
+                $product->setImage($image);
+            }
 
             $manager->persist($product);
 

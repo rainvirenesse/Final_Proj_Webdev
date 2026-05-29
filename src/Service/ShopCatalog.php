@@ -57,6 +57,17 @@ class ShopCatalog
         return $this->productsBySlug()[$slug] ?? null;
     }
 
+    /** @return array<string, string> Product name => image filename (e.g. stelitto.png) */
+    public function getProductImageMap(): array
+    {
+        $map = [];
+        foreach ($this->productsBySlug() as $row) {
+            $map[$row['name']] = $row['image'];
+        }
+
+        return $map;
+    }
+
     /** @return array<string, array<string, mixed>> */
     private function productsBySlug(): array
     {
